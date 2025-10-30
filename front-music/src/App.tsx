@@ -11,14 +11,17 @@ function App() {
   return (
     <div className="App">
       <Header onProfileClick={() => setIsSettingsOpen(true)} />
-      <Side />
-      <main className="App__main">
-        <BrowserRouter>
+      <BrowserRouter>
+        <Side />
+        <main className="App__main">
           <Routes>
-            <Route path="/" element={<Screens.Home />} />
+            <Route path="/" element={<Screens.Home selectedInstrument="piano" />} />
+            <Route path="/piano" element={<Screens.PianoPage />} />
+            <Route path="/drum" element={<Screens.DrumPage />} />
+            <Route path="/admin" element={<Screens.Admin selectedInstrument="piano" />} />
           </Routes>
-        </BrowserRouter>
-      </main>
+        </main>
+      </BrowserRouter>
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}

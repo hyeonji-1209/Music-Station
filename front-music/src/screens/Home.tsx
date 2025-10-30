@@ -1,25 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { OpenSheetMusicDisplay } from 'opensheetmusicdisplay';
+import * as Tone from 'tone';
 import Piano from '../components/Piano';
+import DrumKit from '../components/DrumKit';
+import { InstrumentType } from '../components/layout/Side';
+import { getInstrumentLabel } from '../utils/instruments';
+import { OSMD_CONFIG } from '../utils/osmd';
 import '../style/screens/Home.scss';
-
-// 음표 이름을 주파수로 변환
-const noteToFrequency = (note: string, transpose: number = 0): number => {
-  const noteMap: { [key: string]: number } = {
-    'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11
-  };
-
-  const noteName = note[0].toUpperCase();
-  const octave = parseInt(note[1]);
-  const semitone = noteMap[noteName];
-
-  const A4 = 440;
-  const C4 = A4 * Math.pow(2, -9/12);
-  const noteNumber = semitone + (octave * 12) + transpose;
-  const C4Number = 0 + (4 * 12);
-
-  return C4 * Math.pow(2, (noteNumber - C4Number) / 12);
-};
 
 // 반짝반짝 작은별 음표 데이터
 const twinkleTwinkleNotes = [
@@ -55,64 +42,92 @@ const keyOptions = [
   { label: 'B (시)', value: 11 },
 ];
 
-const Home: React.FC = () => {
+interface HomeProps {
+  selectedInstrument: InstrumentType;
+}
+
+const drumNotes = [
+  { drum: 'kick', duration: 500 },
+  { drum: 'snare', duration: 500 },
+  { drum: 'hihat', duration: 500 },
+  { drum: 'snare', duration: 500 },
+  { drum: 'kick', duration: 500 },
+  { drum: 'hihat', duration: 500 },
+  { drum: 'snare', duration: 500 },
+  { drum: 'hihat', duration: 500 },
+  { drum: 'kick', duration: 500 },
+  { drum: 'snare', duration: 500 },
+  { drum: 'kick', duration: 500 },
+  { drum: 'snare', duration: 500 },
+  { drum: 'kick', duration: 500 },
+  { drum: 'hihat', duration: 500 },
+  { drum: 'snare', duration: 1000 },
+];
+
+const Home: React.FC<HomeProps> = ({ selectedInstrument }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
+  const pianoRef = useRef<Tone.Sampler | null>(null);
+  const drumRef = useRef<Tone.Players | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentNoteIndex, setCurrentNoteIndex] = useState<number>(-1);
   const [transposeValue, setTransposeValue] = useState<number>(0);
+  const [bpm, setBpm] = useState<number>(120);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // AudioContext 초기화
-    audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
+    pianoRef.current = new Tone.Sampler({
+      urls: {
+        A0: "A0.mp3", C1: "C1.mp3", "D#1": "Ds1.mp3", "F#1": "Fs1.mp3",
+        A1: "A1.mp3", C2: "C2.mp3", "D#2": "Ds2.mp3", "F#2": "Fs2.mp3",
+        A2: "A2.mp3", C3: "C3.mp3", "D#3": "Ds3.mp3", "F#3": "Fs3.mp3",
+        A3: "A3.mp3", C4: "C4.mp3", "D#4": "Ds4.mp3", "F#4": "Fs4.mp3",
+        A4: "A4.mp3", C5: "C5.mp3", "D#5": "Ds5.mp3", "F#5": "Fs5.mp3",
+        A5: "A5.mp3", C6: "C6.mp3", "D#6": "Ds6.mp3", "F#6": "Fs6.mp3",
+        A6: "A6.mp3", C7: "C7.mp3", "D#7": "Ds7.mp3", "F#7": "Fs7.mp3",
+        A7: "A7.mp3", C8: "C8.mp3"
+      },
+      release: 1,
+      baseUrl: "https://tonejs.github.io/audio/salamander/"
+    }).toDestination();
+
+    drumRef.current = new Tone.Players({
+      urls: {
+        kick: "https://tonejs.github.io/audio/drum-samples/acoustic-kit/kick.mp3",
+        snare: "https://tonejs.github.io/audio/drum-samples/acoustic-kit/snare.mp3",
+        hihat: "https://tonejs.github.io/audio/drum-samples/acoustic-kit/hihat.mp3",
+      }
+    }).toDestination();
 
     return () => {
       osmdRef.current?.clear();
-      audioContextRef.current?.close();
+      pianoRef.current?.dispose();
+      drumRef.current?.dispose();
     };
   }, []);
 
-  // 키 변경 시 악보 다시 렌더링
   useEffect(() => {
     loadAndRenderSheet();
-  }, [transposeValue]);
+  }, [transposeValue, selectedInstrument]);
 
   const loadAndRenderSheet = async () => {
     if (!containerRef.current) return;
 
     try {
-      // 이전 인스턴스 정리
-      if (osmdRef.current) {
-        osmdRef.current.clear();
-      }
-
-      // 컨테이너 내용 완전히 비우기
+      if (osmdRef.current) osmdRef.current.clear();
       containerRef.current.innerHTML = '';
 
-      // OpenSheetMusicDisplay 재생성
-      osmdRef.current = new OpenSheetMusicDisplay(containerRef.current, {
-        autoResize: false,
-        backend: 'svg',
-        drawTitle: false,
-        drawSubtitle: false,
-        drawComposer: false,
-        drawCredits: false,
-        drawingParameters: 'compact',
-      });
+      osmdRef.current = new OpenSheetMusicDisplay(containerRef.current, OSMD_CONFIG);
 
-      // MusicXML 파일 가져오기
-      const response = await fetch('/musicxml/twinkle.xml');
+      const xmlFile = selectedInstrument === 'drum' ? '/musicxml/drum.xml' : '/musicxml/twinkle.xml';
+      const response = await fetch(xmlFile);
       let xmlText = await response.text();
 
-      // 조옮김이 필요한 경우 XML 수정
-      if (transposeValue !== 0) {
+      if (transposeValue !== 0 && selectedInstrument !== 'drum') {
         xmlText = transposeXML(xmlText, transposeValue);
       }
 
-      // 수정된 XML 로드
       await osmdRef.current.load(xmlText);
       osmdRef.current.render();
     } catch (error) {
@@ -120,15 +135,19 @@ const Home: React.FC = () => {
     }
   };
 
-  // MusicXML의 음표를 조옮김하는 함수
   const transposeXML = (xmlText: string, semitones: number): string => {
     const parser = new DOMParser();
     const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
-
-    // 모든 pitch 요소 찾기
     const pitches = xmlDoc.getElementsByTagName('pitch');
-
     const noteNames = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+    const semitoneToNote: { [key: number]: { step: string; alter: number } } = {
+      0: { step: 'C', alter: 0 }, 1: { step: 'C', alter: 1 },
+      2: { step: 'D', alter: 0 }, 3: { step: 'D', alter: 1 },
+      4: { step: 'E', alter: 0 }, 5: { step: 'F', alter: 0 },
+      6: { step: 'F', alter: 1 }, 7: { step: 'G', alter: 0 },
+      8: { step: 'G', alter: 1 }, 9: { step: 'A', alter: 0 },
+      10: { step: 'A', alter: 1 }, 11: { step: 'B', alter: 0 },
+    };
 
     for (let i = 0; i < pitches.length; i++) {
       const pitch = pitches[i];
@@ -138,41 +157,18 @@ const Home: React.FC = () => {
 
       if (!stepEl || !octaveEl) continue;
 
-      let step = stepEl.textContent || 'C';
-      let octave = parseInt(octaveEl.textContent || '4');
-      let alter = alterEl ? parseInt(alterEl.textContent || '0') : 0;
+      const step = stepEl.textContent || 'C';
+      const octave = parseInt(octaveEl.textContent || '4');
+      const alter = alterEl ? parseInt(alterEl.textContent || '0') : 0;
 
-      // 현재 음표를 반음 단위로 변환
       const noteIndex = noteNames.indexOf(step);
-      const stepsToC = [0, 2, 4, 5, 7, 9, 11][noteIndex]; // C=0, D=2, E=4, F=5, G=7, A=9, B=11
-      let totalSemitones = stepsToC + alter + (octave * 12);
+      const stepsToC = [0, 2, 4, 5, 7, 9, 11][noteIndex];
+      let totalSemitones = stepsToC + alter + (octave * 12) + semitones;
 
-      // 조옮김 적용
-      totalSemitones += semitones;
-
-      // 다시 음계로 변환
       const newOctave = Math.floor(totalSemitones / 12);
-      let semitonesInOctave = ((totalSemitones % 12) + 12) % 12;
-
-      // 반음을 음계로 변환
-      const semitoneToNote: { [key: number]: { step: string; alter: number } } = {
-        0: { step: 'C', alter: 0 },
-        1: { step: 'C', alter: 1 },
-        2: { step: 'D', alter: 0 },
-        3: { step: 'D', alter: 1 },
-        4: { step: 'E', alter: 0 },
-        5: { step: 'F', alter: 0 },
-        6: { step: 'F', alter: 1 },
-        7: { step: 'G', alter: 0 },
-        8: { step: 'G', alter: 1 },
-        9: { step: 'A', alter: 0 },
-        10: { step: 'A', alter: 1 },
-        11: { step: 'B', alter: 0 },
-      };
-
+      const semitonesInOctave = ((totalSemitones % 12) + 12) % 12;
       const newNote = semitoneToNote[semitonesInOctave];
 
-      // XML 업데이트
       stepEl.textContent = newNote.step;
       octaveEl.textContent = newOctave.toString();
 
@@ -189,61 +185,42 @@ const Home: React.FC = () => {
       }
     }
 
-    const serializer = new XMLSerializer();
-    return serializer.serializeToString(xmlDoc);
+    return new XMLSerializer().serializeToString(xmlDoc);
   };
 
-  // 재생 중인 음표 파란색으로 하이라이트
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // 모든 음표를 기본 색으로 되돌리기
     const allNotes = containerRef.current.querySelectorAll('.vf-stavenote');
     allNotes.forEach((note) => {
       (note as SVGElement).style.fill = '#000';
       (note as SVGElement).style.stroke = '#000';
     });
 
-    // 현재 재생 중인 음표를 파란색으로
     if (currentNoteIndex >= 0 && currentNoteIndex < allNotes.length) {
       const currentNote = allNotes[currentNoteIndex] as SVGElement;
       currentNote.style.fill = '#2196F3';
       currentNote.style.stroke = '#2196F3';
 
-      // 하위 요소들도 파란색으로
-      const children = currentNote.querySelectorAll('*');
-      children.forEach((child) => {
+      currentNote.querySelectorAll('*').forEach((child) => {
         (child as SVGElement).style.fill = '#2196F3';
         (child as SVGElement).style.stroke = '#2196F3';
       });
     }
   }, [currentNoteIndex]);
 
-  // 소리 재생 함수
-  const playSound = (frequency: number, duration: number) => {
-    if (!audioContextRef.current) return;
-
-    const ctx = audioContextRef.current;
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
-
-    oscillator.frequency.value = frequency;
-    oscillator.type = 'sine';
-
-    const now = ctx.currentTime;
-    gainNode.gain.setValueAtTime(0, now);
-    gainNode.gain.linearRampToValueAtTime(0.3, now + 0.01);
-    gainNode.gain.exponentialRampToValueAtTime(0.2, now + 0.1);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, now + duration / 1000);
-
-    oscillator.start(now);
-    oscillator.stop(now + duration / 1000);
+  const playPiano = async (note: string, duration: number) => {
+    if (!pianoRef.current) return;
+    if (Tone.getContext().state !== 'running') await Tone.start();
+    pianoRef.current.triggerAttackRelease(note, duration / 1000);
   };
 
-  // 재생 로직
+  const playDrum = async (drum: string) => {
+    if (!drumRef.current) return;
+    if (Tone.getContext().state !== 'running') await Tone.start();
+    drumRef.current.player(drum).start();
+  };
+
   useEffect(() => {
     if (!isPlaying) return;
 
@@ -251,22 +228,44 @@ const Home: React.FC = () => {
     let currentIndex = 0;
 
     const playNextNote = () => {
-      if (currentIndex >= twinkleTwinkleNotes.length) {
-        setIsPlaying(false);
-        setCurrentNoteIndex(-1);
-        return;
+      if (selectedInstrument === 'drum') {
+        if (currentIndex >= drumNotes.length) {
+          setIsPlaying(false);
+          setCurrentNoteIndex(-1);
+          return;
+        }
+
+        setCurrentNoteIndex(currentIndex);
+
+        const { drum, duration } = drumNotes[currentIndex];
+        const adjustedDuration = (duration * 120) / bpm;
+
+        playDrum(drum);
+
+        timeoutId = setTimeout(() => {
+          currentIndex++;
+          playNextNote();
+        }, adjustedDuration);
+      } else {
+        if (currentIndex >= twinkleTwinkleNotes.length) {
+          setIsPlaying(false);
+          setCurrentNoteIndex(-1);
+          return;
+        }
+
+        setCurrentNoteIndex(currentIndex);
+
+        const { note, duration } = twinkleTwinkleNotes[currentIndex];
+        const transposedNote = getTransposedNote(note, transposeValue);
+        const adjustedDuration = (duration * 120) / bpm;
+
+        playPiano(transposedNote, adjustedDuration);
+
+        timeoutId = setTimeout(() => {
+          currentIndex++;
+          playNextNote();
+        }, adjustedDuration);
       }
-
-      setCurrentNoteIndex(currentIndex);
-
-      const { note, duration } = twinkleTwinkleNotes[currentIndex];
-      const frequency = noteToFrequency(note, transposeValue);
-      playSound(frequency, duration);
-
-      timeoutId = setTimeout(() => {
-        currentIndex++;
-        playNextNote();
-      }, duration);
     };
 
     playNextNote();
@@ -274,24 +273,21 @@ const Home: React.FC = () => {
     return () => {
       if (timeoutId) clearTimeout(timeoutId);
     };
-  }, [isPlaying, transposeValue]);
+  }, [isPlaying, transposeValue, bpm, selectedInstrument]);
 
   const handlePlayPause = () => {
-    if (isPlaying) {
-      setIsPlaying(false);
-      setCurrentNoteIndex(-1);
-    } else {
-      setIsPlaying(true);
-    }
+    setIsPlaying(!isPlaying);
+    if (isPlaying) setCurrentNoteIndex(-1);
   };
 
   const handleKeyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setTransposeValue(parseInt(e.target.value));
   };
 
-  const currentKey = keyOptions.find(k => k.value === transposeValue)?.label || 'C (도)';
+  const handleBpmChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setBpm(parseInt(e.target.value));
+  };
 
-  // 음표를 조옮김하는 헬퍼 함수
   const getTransposedNote = (note: string, semitones: number): string => {
     const noteMap: { [key: string]: number } = {
       'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11
@@ -309,26 +305,54 @@ const Home: React.FC = () => {
     return `${reverseNoteMap[newSemitone]}${newOctave}`;
   };
 
+  const currentKey = keyOptions.find(k => k.value === transposeValue)?.label || 'C (도)';
+
   return (
     <div className="home">
       <div className="home__container">
-        <h1 className="home__title">반짝반짝 작은별</h1>
+        <h1 className="home__title">반짝반짝 작은별 - {getInstrumentLabel(selectedInstrument)}</h1>
 
         <div className="home__controls">
-          <div className="home__key-selector">
+          {selectedInstrument !== 'drum' && (
+            <div className="home__key-selector">
+              <label className="home__label">
+                키 선택:
+                <select
+                  className="home__select"
+                  value={transposeValue}
+                  onChange={handleKeyChange}
+                >
+                  {keyOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          )}
+
+          <div className="home__bpm-selector">
             <label className="home__label">
-              키 선택:
-              <select
-                className="home__select"
-                value={transposeValue}
-                onChange={handleKeyChange}
-              >
-                {keyOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
+              BPM:
+              <div className="home__bpm-control">
+                <input
+                  type="range"
+                  className="home__bpm-slider"
+                  min="40"
+                  max="240"
+                  value={bpm}
+                  onChange={handleBpmChange}
+                />
+                <input
+                  type="number"
+                  className="home__bpm-input"
+                  min="40"
+                  max="240"
+                  value={bpm}
+                  onChange={handleBpmChange}
+                />
+              </div>
             </label>
           </div>
 
@@ -340,24 +364,55 @@ const Home: React.FC = () => {
           </button>
         </div>
 
+        {selectedInstrument === 'drum' && (
+          <div className="home__drum-legend">
+            <h3>드럼 파트 설명</h3>
+            <div className="home__drum-legend-items">
+              <div className="home__drum-legend-item">
+                <span className="home__drum-legend-symbol">C (X)</span>
+                <span className="home__drum-legend-label">Bass Drum (킥)</span>
+              </div>
+              <div className="home__drum-legend-item">
+                <span className="home__drum-legend-symbol">E (○)</span>
+                <span className="home__drum-legend-label">Snare Drum (스네어)</span>
+              </div>
+              <div className="home__drum-legend-item">
+                <span className="home__drum-legend-symbol">G (X)</span>
+                <span className="home__drum-legend-label">Hi-Hat (하이햇)</span>
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="musical-staff">
           <div ref={containerRef} id="osmd-container" />
         </div>
 
-        {/* 피아노 건반 */}
-        <Piano
-          activeNote={
-            currentNoteIndex >= 0
-              ? getTransposedNote(twinkleTwinkleNotes[currentNoteIndex].note, transposeValue)
-              : undefined
-          }
-        />
+        {/* 피아노 건반 - 피아노일 때만 표시 */}
+        {selectedInstrument === 'piano' && (
+          <Piano
+            activeNote={
+              currentNoteIndex >= 0
+                ? getTransposedNote(twinkleTwinkleNotes[currentNoteIndex].note, transposeValue)
+                : undefined
+            }
+          />
+        )}
+
+        {/* 드럼킷 - 드럼일 때만 표시 */}
+        {selectedInstrument === 'drum' && (
+          <DrumKit activeDrum={currentNoteIndex >= 0 ? drumNotes[currentNoteIndex].drum : undefined} />
+        )}
 
         <div className="home__info">
-          <p>현재 키: {currentKey}</p>
+          {selectedInstrument !== 'drum' && <p>현재 키: {currentKey}</p>}
+          <p>BPM: {bpm}</p>
           <p>재생 중: {isPlaying ? '예' : '아니오'}</p>
-          {currentNoteIndex >= 0 && (
+          {currentNoteIndex >= 0 && selectedInstrument === 'piano' && (
             <p>현재 음표: {twinkleTwinkleNotes[currentNoteIndex].note}</p>
+          )}
+          {currentNoteIndex >= 0 && selectedInstrument === 'drum' && (
+            <p>현재 드럼: {drumNotes[currentNoteIndex].drum}</p>
           )}
         </div>
       </div>

@@ -56,4 +56,44 @@
       }
     }
   }
+
+  &__instruments {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  &__instrument {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: #cccccc;
+    font-size: 1rem;
+    font-weight: 500;
+
+    &:hover {
+      background-color: #1a1a1a;
+      color: #ffffff;
+      transform: translateX(3px);
+    }
+
+    &--active {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: #ffffff;
+      box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+      transform: translateX(3px);
+
+      &:hover {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+    }
+
+    &-label {
+      flex: 1;
+    }
+  }
 }

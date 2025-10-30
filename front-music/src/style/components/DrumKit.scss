@@ -1,0 +1,168 @@
+.drumkit {
+  width: 100%;
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: linear-gradient(to bottom, #2c3e50 0%, #34495e 100%);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+
+  &__container {
+    padding: 2rem;
+  }
+
+  &__drums {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 3rem;
+    flex-wrap: wrap;
+  }
+
+  &__drum {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    transition: all 0.2s ease;
+
+    &--active {
+      .drumkit__drum-visual {
+        transform: scale(1.1);
+        box-shadow: 0 0 30px rgba(102, 126, 234, 0.8);
+      }
+
+      .drumkit__drum-label {
+        color: #667eea;
+        font-weight: 700;
+      }
+    }
+  }
+
+  &__drum-visual {
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    position: relative;
+
+    &--hihat {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+      border: 4px solid #333;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #ffe44d 0%, #ffd700 100%);
+        border-radius: 50%;
+        border: 2px solid #333;
+      }
+    }
+
+    &--snare {
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, #e0e0e0 0%, #bdbdbd 100%);
+      border: 5px solid #333;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+
+      &::before {
+        content: '';
+        position: absolute;
+        top: 10%;
+        left: 10%;
+        right: 10%;
+        bottom: 10%;
+        background: repeating-linear-gradient(
+          90deg,
+          #333 0px,
+          #333 2px,
+          transparent 2px,
+          transparent 10px
+        );
+        border-radius: 50%;
+      }
+    }
+
+    &--kick {
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+      border: 6px solid #333;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 30px;
+        height: 30px;
+        background: #666;
+        border-radius: 50%;
+        border: 2px solid #444;
+      }
+    }
+  }
+
+  &__drum-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    text-align: center;
+    transition: all 0.2s ease;
+  }
+}
+
+// 반응형 디자인
+@media (max-width: 768px) {
+  .drumkit {
+    padding: 1rem;
+
+    &__container {
+      padding: 1rem;
+    }
+
+    &__drums {
+      gap: 1.5rem;
+    }
+
+    &__drum-visual {
+      &--hihat {
+        width: 60px;
+        height: 60px;
+
+        &::after {
+          width: 45px;
+          height: 45px;
+        }
+      }
+
+      &--snare {
+        width: 80px;
+        height: 80px;
+      }
+
+      &--kick {
+        width: 100px;
+        height: 100px;
+
+        &::after {
+          width: 25px;
+          height: 25px;
+        }
+      }
+    }
+
+    &__drum-label {
+      font-size: 0.9rem;
+    }
+  }
+}
