@@ -89,11 +89,18 @@ const Home: React.FC = () => {
         osmdRef.current.clear();
       }
 
+      // 컨테이너 내용 완전히 비우기
+      containerRef.current.innerHTML = '';
+
       // OpenSheetMusicDisplay 재생성
       osmdRef.current = new OpenSheetMusicDisplay(containerRef.current, {
-        autoResize: true,
+        autoResize: false,
         backend: 'svg',
-        drawTitle: true,
+        drawTitle: false,
+        drawSubtitle: false,
+        drawComposer: false,
+        drawCredits: false,
+        drawingParameters: 'compact',
       });
 
       // MusicXML 파일 가져오기
