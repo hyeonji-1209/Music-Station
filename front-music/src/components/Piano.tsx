@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useMemo } from 'react';
-import '../style/components/Piano.scss';
 
 interface PianoProps {
   activeNote?: string;

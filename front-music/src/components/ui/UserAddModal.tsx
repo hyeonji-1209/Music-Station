@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Button from './Button';
-import '../../style/components/ui/UserAddModal.scss';
 
 export interface UserFormData {
   name: string;

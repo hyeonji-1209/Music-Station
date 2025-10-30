@@ -1,5 +1,4 @@
 import React from 'react';
-import '../style/components/DrumKit.scss';
 
 interface DrumKitProps {
   activeDrum?: string;

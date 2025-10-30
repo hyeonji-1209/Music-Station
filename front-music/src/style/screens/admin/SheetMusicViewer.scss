@@ -1,3 +1,6 @@
+@import '../../variables';
+@import '../../mixins';
+
 .sheet-music-viewer {
   width: 100%;
   min-height: calc(100vh - 56px);
@@ -55,19 +58,14 @@
   }
 
   &__loading {
-    padding: 3rem;
-    text-align: center;
-    color: #666666;
-    font-size: 0.95rem;
+    @include status-message;
   }
 
   &__error {
-    padding: 3rem;
-    text-align: center;
-    color: #000000;
-    font-size: 0.95rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    background-color: #fafafa;
+    @include status-message;
+    color: $text-color;
+    border: 1px solid $border-color;
+    border-radius: $radius-lg;
+    background-color: $background-light;
   }
 }

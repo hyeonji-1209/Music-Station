@@ -1,13 +1,7 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import '../../style/components/layout/Side.scss';
 
 export type InstrumentType = 'piano' | 'drum' | 'bass' | 'guitar' | 'vocal';
-
-interface SideProps {
-  selectedInstrument?: InstrumentType;
-  onSelectInstrument?: (instrument: InstrumentType) => void;
-}
 
 const instruments = [
   { id: 'piano' as InstrumentType, label: '피아노' },
@@ -17,53 +11,23 @@ const instruments = [
   { id: 'vocal' as InstrumentType, label: '보컬' },
 ];
 
-const Side: React.FC<SideProps> = ({ selectedInstrument = 'piano', onSelectInstrument }) => {
+const Side: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
   // 현재 경로에 따라 활성 악기 결정
   const getCurrentInstrument = (): InstrumentType => {
-    switch (location.pathname) {
-      case '/piano':
-        return 'piano';
-      case '/drum':
-        return 'drum';
-      case '/bass':
-        return 'bass';
-      case '/guitar':
-        return 'guitar';
-      case '/vocal':
-        return 'vocal';
-      default:
-        return 'piano';
+    const path = location.pathname.substring(1); // Remove leading '/'
+    if (['piano', 'drum', 'bass', 'guitar', 'vocal'].includes(path)) {
+      return path as InstrumentType;
     }
+    return 'piano';
   };
 
   const currentInstrument = getCurrentInstrument();
 
   const handleInstrumentClick = (instrument: InstrumentType) => {
-    onSelectInstrument?.(instrument);
-
-    // 악기에 따라 해당 페이지로 이동
-    switch (instrument) {
-      case 'piano':
-        navigate('/piano');
-        break;
-      case 'drum':
-        navigate('/drum');
-        break;
-      case 'bass':
-        navigate('/bass');
-        break;
-      case 'guitar':
-        navigate('/guitar');
-        break;
-      case 'vocal':
-        navigate('/vocal');
-        break;
-      default:
-        navigate('/');
-    }
+    navigate(`/${instrument}`);
   };
 
   return (
@@ -96,8 +60,9 @@ const Side: React.FC<SideProps> = ({ selectedInstrument = 'piano', onSelectInstr
             {instruments.map((instrument) => (
               <li
                 key={instrument.id}
-                className={`side__instrument ${currentInstrument === instrument.id ? 'side__instrument--active' : ''
-                  }`}
+                className={`side__instrument ${
+                  currentInstrument === instrument.id ? 'side__instrument--active' : ''
+                }`}
                 onClick={() => handleInstrumentClick(instrument.id)}
               >
                 <span className="side__instrument-label">{instrument.label}</span>

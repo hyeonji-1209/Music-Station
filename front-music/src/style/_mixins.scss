@@ -1,0 +1,224 @@
+@import './variables';
+
+// Flexbox mixins
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Button mixin
+@mixin button-base {
+  padding: $spacing-sm $spacing-xl;
+  font-size: $font-md;
+  font-weight: $font-semibold;
+  color: $background-color;
+  background: $primary-color;
+  border: 2px solid $primary-color;
+  border-radius: $radius-md;
+  cursor: pointer;
+  transition: all $transition-normal;
+  box-shadow: $shadow-lg;
+
+  &:hover {
+    transform: translateY(-1px);
+    background: $secondary-color;
+    border-color: $secondary-color;
+    box-shadow: $shadow-xl;
+  }
+
+  &:active {
+    transform: translateY(0);
+    background: $primary-color;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+// Input mixin
+@mixin input-base {
+  padding: $spacing-sm $spacing-md;
+  font-size: $font-md;
+  border: 2px solid $primary-color;
+  border-radius: $radius-md;
+  background: $background-color;
+  color: $text-color;
+  transition: all $transition-normal;
+
+  &:focus {
+    outline: none;
+    border-color: $secondary-color;
+    box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+  }
+}
+
+// Card mixin
+@mixin card {
+  background: $background-color;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-md;
+  border: 1px solid $border-color;
+}
+
+// Container mixin
+@mixin container {
+  max-width: 1400px;
+  margin: 0 auto;
+  @include card;
+  padding: $spacing-lg;
+}
+
+// Label mixin
+@mixin label {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  font-size: $font-md;
+  font-weight: $font-semibold;
+  color: $text-color;
+}
+
+// Responsive mixin
+@mixin mobile {
+  @media (max-width: $breakpoint-mobile) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: $breakpoint-tablet) {
+    @content;
+  }
+}
+
+// Text truncate
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// Hover lift effect
+@mixin hover-lift {
+  transition: transform $transition-fast, box-shadow $transition-fast;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+// Admin page container
+@mixin admin-page {
+  padding: $spacing-lg;
+  background: $background-color;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-md;
+}
+
+// Modal overlay
+@mixin modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  @include flex-center;
+  z-index: $z-modal;
+  padding: $spacing-lg;
+}
+
+// Modal container
+@mixin modal-container($max-width: 600px) {
+  background: $background-color;
+  border-radius: $radius-lg;
+  width: 100%;
+  max-width: $max-width;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: $shadow-xl;
+  animation: modalFadeIn $transition-normal ease-out;
+}
+
+// Modal header
+@mixin modal-header {
+  @include flex-between;
+  padding: $spacing-lg $spacing-xl;
+  border-bottom: 1px solid $border-color;
+  background: $background-color;
+}
+
+// Modal content
+@mixin modal-content {
+  padding: $spacing-xl;
+  overflow-y: auto;
+  color: $text-color;
+  flex: 1;
+}
+
+// Badge style
+@mixin badge($bg-color, $text-color) {
+  padding: $spacing-xs $spacing-sm;
+  border-radius: $radius-sm;
+  font-size: $font-xs;
+  font-weight: $font-semibold;
+  background-color: $bg-color;
+  color: $text-color;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+// Status message (loading, error, placeholder)
+@mixin status-message {
+  padding: $spacing-3xl;
+  text-align: center;
+  color: $text-muted;
+  font-size: $font-md;
+}
+
+// Actions container (for buttons)
+@mixin actions-container {
+  display: flex;
+  gap: $spacing-md;
+  align-items: center;
+  flex-wrap: wrap;
+
+  @include mobile {
+    flex-direction: column;
+
+    > * {
+      width: 100%;
+    }
+  }
+}
+
+// Modal fade-in animation
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

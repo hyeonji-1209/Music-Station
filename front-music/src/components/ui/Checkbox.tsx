@@ -1,5 +1,4 @@
 import React from 'react';
-import '../../style/components/ui/Checkbox.scss';
 
 export interface CheckboxProps {
   id?: string;

@@ -1,37 +1,39 @@
+@import '../variables';
+@import '../mixins';
+
 .piano {
   width: 100%;
-  margin: 0.5rem 0;
-  padding: 0.75rem;
-  background: #f5f5f5;
-  border-radius: 6px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  border: 1px solid #e0e0e0;
+  margin: $spacing-sm 0;
+  padding: $spacing-md;
+  background: $background-light;
+  border-radius: $radius-md;
+  box-shadow: $shadow-md;
+  border: 1px solid $border-color;
 
   &__scroll-container {
     overflow-x: auto;
     overflow-y: hidden;
-    background: #ffffff;
-    border-radius: 6px;
-    padding: 0.75rem;
+    background: $background-color;
+    border-radius: $radius-md;
+    padding: $spacing-md;
     box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
-    border: 1px solid #e0e0e0;
+    border: 1px solid $border-color;
 
-    // 스크롤바 스타일링
     &::-webkit-scrollbar {
       height: 10px;
     }
 
     &::-webkit-scrollbar-track {
-      background: #f5f5f5;
+      background: $background-light;
       border-radius: 5px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #000000;
+      background: $primary-color;
       border-radius: 5px;
 
       &:hover {
-        background: #333333;
+        background: $secondary-color;
       }
     }
   }
@@ -48,34 +50,34 @@
     position: relative;
     cursor: pointer;
     user-select: none;
-    transition: all 0.1s ease;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    padding-bottom: 0.5rem;
+    transition: all $transition-fast;
+    @include flex-column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: $spacing-sm;
 
     &--white {
       width: 50px;
       height: 180px;
-      background: #ffffff;
-      border: 2px solid #000000;
-      border-radius: 0 0 8px 8px;
+      background: $background-color;
+      border: 2px solid $primary-color;
+      border-radius: 0 0 $radius-lg $radius-lg;
       margin: 0 1px;
-      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+      box-shadow: $shadow-md;
       z-index: 1;
 
       &:hover {
-        background: #f5f5f5;
+        background: $background-light;
       }
 
       &.piano__key--active {
-        background: #000000;
+        background: $primary-color;
         transform: translateY(3px);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        box-shadow: $shadow-sm;
 
         .piano__key-label {
-          color: #ffffff;
-          font-weight: bold;
+          color: $background-color;
+          font-weight: $font-bold;
         }
       }
     }
@@ -83,50 +85,49 @@
     &--black {
       width: 30px;
       height: 120px;
-      background: #000000;
-      border: 2px solid #000000;
-      border-radius: 0 0 4px 4px;
+      background: $primary-color;
+      border: 2px solid $primary-color;
+      border-radius: 0 0 $radius-sm $radius-sm;
       margin: 0 -16px;
-      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
+      box-shadow: $shadow-lg;
       z-index: 2;
 
       &:hover {
-        background: #333333;
+        background: $secondary-color;
       }
 
       &.piano__key--active {
-        background: #ffffff;
-        border-color: #000000;
+        background: $background-color;
+        border-color: $primary-color;
         transform: translateY(3px);
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        box-shadow: $shadow-sm;
 
         .piano__key-label {
-          color: #000000;
-          font-weight: bold;
+          color: $primary-color;
+          font-weight: $font-bold;
         }
       }
 
       .piano__key-label {
-        color: #ffffff;
-        font-size: 0.7rem;
+        color: $background-color;
+        font-size: $font-xs;
       }
     }
   }
 
   &__key-label {
-    font-size: 0.9rem;
-    color: #000000;
-    font-weight: 500;
+    font-size: $font-md;
+    color: $text-color;
+    font-weight: $font-medium;
     text-align: center;
     pointer-events: none;
   }
 }
 
-// 반응형 디자인
-@media (max-width: 768px) {
+@include mobile {
   .piano {
-    padding: 0.5rem;
-    margin: 0.25rem 0;
+    padding: $spacing-sm;
+    margin: $spacing-xs 0;
 
     &__keys {
       height: 150px;
@@ -145,7 +146,7 @@
       }
 
       &-label {
-        font-size: 0.7rem;
+        font-size: $font-xs;
       }
     }
   }

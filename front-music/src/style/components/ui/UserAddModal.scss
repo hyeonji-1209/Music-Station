@@ -1,148 +1,136 @@
+@import '../../variables';
+@import '../../mixins';
+
 .user-add-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+  @include modal-overlay;
 }
 
 .user-add-modal {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  @include modal-container(500px);
   width: 90%;
-  max-width: 500px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
 
-.user-add-modal__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px;
-  border-bottom: 1px solid #e5e5e5;
+  &__header {
+    @include modal-header;
+    padding: $spacing-lg;
 
-  h2 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: #000;
-  }
-}
-
-.user-add-modal__close {
-  background: none;
-  border: none;
-  font-size: 24px;
-  color: #666;
-  cursor: pointer;
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:hover {
-    color: #000;
+    h2 {
+      margin: 0;
+      font-size: $font-xl;
+      font-weight: $font-bold;
+      color: $text-color;
+    }
   }
 
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
+  &__close {
+    background: transparent;
+    border: none;
+    font-size: $font-3xl;
+    color: $text-muted;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    @include flex-center;
+    border-radius: $radius-sm;
+    transition: all $transition-fast;
 
-.user-add-modal__form {
-  padding: 24px;
-}
-
-.user-add-modal__field {
-  margin-bottom: 20px;
-
-  &:last-of-type {
-    margin-bottom: 0;
-  }
-
-  label {
-    display: block;
-    margin-bottom: 6px;
-    font-size: 14px;
-    font-weight: 500;
-    color: #333;
-  }
-
-  input,
-  select {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    transition: border-color 0.2s ease;
-
-    &:focus {
-      outline: none;
-      border-color: #000;
+    &:hover:not(:disabled) {
+      background: $background-light;
+      color: $text-color;
     }
 
     &:disabled {
-      background-color: #f5f5f5;
+      opacity: 0.5;
       cursor: not-allowed;
     }
+  }
 
-    &.error {
-      border-color: #e74c3c;
+  &__form {
+    padding: $spacing-lg;
+  }
+
+  &__field {
+    margin-bottom: $spacing-lg;
+
+    label {
+      display: block;
+      margin-bottom: $spacing-sm;
+      font-size: $font-sm;
+      font-weight: $font-semibold;
+      color: $text-color;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: $spacing-sm $spacing-md;
+      font-size: $font-md;
+      border: 2px solid $border-color;
+      border-radius: $radius-md;
+      background: $background-color;
+      color: $text-color;
+      transition: all $transition-normal;
+
+      &:focus {
+        outline: none;
+        border-color: $primary-color;
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+      }
+
+      &.error {
+        border-color: #dc2626;
+      }
+
+      &:disabled {
+        background: $background-light;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+    }
+
+    .error-message {
+      display: block;
+      margin-top: $spacing-xs;
+      font-size: $font-xs;
+      color: #dc2626;
     }
   }
 
-  select {
-    cursor: pointer;
+  &__actions {
+    @include flex-center;
+    gap: $spacing-md;
+    padding-top: $spacing-md;
+    border-top: 1px solid $border-color;
   }
 }
 
-.error-message {
-  display: block;
-  margin-top: 4px;
-  font-size: 12px;
-  color: #e74c3c;
-}
-
-.user-add-modal__actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 24px;
-  padding-top: 20px;
-  border-top: 1px solid #e5e5e5;
-}
-
-// 반응형
-@media (max-width: 768px) {
+@include mobile {
   .user-add-modal {
     width: 95%;
-    margin: 20px;
-  }
+    max-height: 95vh;
 
-  .user-add-modal__header {
-    padding: 16px 20px;
-  }
+    &__header {
+      padding: $spacing-md;
 
-  .user-add-modal__form {
-    padding: 20px;
-  }
+      h2 {
+        font-size: $font-lg;
+      }
+    }
 
-  .user-add-modal__actions {
-    flex-direction: column;
-    
-    .btn {
-      width: 100%;
+    &__form {
+      padding: $spacing-md;
+    }
+
+    &__field {
+      margin-bottom: $spacing-md;
+    }
+
+    &__actions {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
     }
   }
 }

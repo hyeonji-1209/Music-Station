@@ -1,106 +1,57 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Tabs, TabItem, Table, TableColumn, Button, Checkbox } from '../../components';
-import '../../style/screens/admin/MusicManagement.scss';
+import AdminPageLayout from '../../components/layout/AdminPageLayout';
+import { Button, Checkbox, TabItem, TableColumn, DeleteModal } from '../../components';
+import { useTableSelection } from '../../hooks/useTableSelection';
+import { getInstrumentLabel } from '../../utils/labels';
+import { mockMusicData, MusicItem } from '../../constants/mockData';
 
 export type MusicInstrument = 'piano' | 'drum' | 'bass' | 'guitar' | 'vocal' | 'all';
 
-interface MusicItem {
-  id: number;
-  instrument: MusicInstrument;
-  artist: string;
-  title: string;
-  musicXmlUrl: string;
-}
-
-const mockMusicData: Record<MusicInstrument, MusicItem[]> = {
-  all: [
-    { id: 1, instrument: 'piano', artist: '바하', title: '평균율 클라비어곡집', musicXmlUrl: '/musicxml/twinkle.xml' },
-    { id: 2, instrument: 'drum', artist: '드럼 마스터', title: '기본 드럼 리듬', musicXmlUrl: '/musicxml/drum.xml' },
-    { id: 3, instrument: 'piano', artist: '모차르트', title: '피아노 소나타', musicXmlUrl: '/musicxml/twinkle.xml' },
-    { id: 4, instrument: 'guitar', artist: '기타리스트', title: '기타 연주곡', musicXmlUrl: '/musicxml/twinkle.xml' },
-  ],
-  piano: [
-    { id: 1, instrument: 'piano', artist: '바하', title: '평균율 클라비어곡집', musicXmlUrl: '/musicxml/twinkle.xml' },
-    { id: 3, instrument: 'piano', artist: '모차르트', title: '피아노 소나타', musicXmlUrl: '/musicxml/twinkle.xml' },
-  ],
-  drum: [
-    { id: 2, instrument: 'drum', artist: '드럼 마스터', title: '기본 드럼 리듬', musicXmlUrl: '/musicxml/drum.xml' },
-  ],
-  bass: [],
-  guitar: [
-    { id: 4, instrument: 'guitar', artist: '기타리스트', title: '기타 연주곡', musicXmlUrl: '/musicxml/twinkle.xml' },
-  ],
-  vocal: [],
-};
-
-const instrumentLabels: Record<MusicInstrument, string> = {
-  all: '전체',
-  piano: '피아노',
-  drum: '드럼',
-  bass: '베이스',
-  guitar: '기타',
-  vocal: '보컬',
-};
-
 const MusicManagement: React.FC = () => {
   const [selectedInstrument, setSelectedInstrument] = useState<MusicInstrument>('all');
-  const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [musicData, setMusicData] = useState<MusicItem[]>(mockMusicData.all);
-  const [isAllSelected, setIsAllSelected] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+
+  const {
+    selectedIds,
+    selectedCount,
+    hasSelection,
+    isSelected,
+    handleSelectAll,
+    handleSelectOne,
+    clearSelection,
+  } = useTableSelection<MusicItem>(musicData);
 
   const handleInstrumentChange = (instrument: MusicInstrument) => {
     setSelectedInstrument(instrument);
     setMusicData(mockMusicData[instrument] || []);
-    setSelectedRows(new Set());
-    setIsAllSelected(false);
+    clearSelection();
   };
 
   const handleDeleteClick = () => {
-    if (selectedRows.size === 0) return;
-    setIsDeleteModalOpen(true);
+    if (hasSelection) {
+      setIsDeleteModalOpen(true);
+    }
   };
 
-  const handleDeleteConfirmed = () => {
-    if (selectedRows.size === 0) return;
-    const newData = musicData.filter(item => !selectedRows.has(item.id));
+  const handleDeleteConfirmed = async () => {
+    setIsDeleting(true);
+    // TODO: 실제 삭제 API 호출
+    await new Promise(resolve => setTimeout(resolve, 500));
+
+    const selectedArray = Array.from(selectedIds);
+    const newData = musicData.filter(item => !selectedArray.includes(item.id));
     setMusicData(newData);
-    setSelectedRows(new Set());
-    setIsAllSelected(false);
+    clearSelection();
     setIsDeleteModalOpen(false);
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      const allIds = new Set(musicData.map(item => item.id));
-      setSelectedRows(allIds);
-      setIsAllSelected(true);
-    } else {
-      setSelectedRows(new Set());
-      setIsAllSelected(false);
-    }
-  };
-
-  const handleRowSelect = (rowId: number, checked: boolean) => {
-    const newSelected = new Set(selectedRows);
-    if (checked) {
-      newSelected.add(rowId);
-    } else {
-      newSelected.delete(rowId);
-      setIsAllSelected(false);
-    }
-    setSelectedRows(newSelected);
-
-    // 모든 항목이 선택되었는지 확인
-    if (newSelected.size === musicData.length && musicData.length > 0) {
-      setIsAllSelected(true);
-    }
+    setIsDeleting(false);
   };
 
   const handleViewMusic = (musicXmlUrl: string) => {
@@ -186,8 +137,8 @@ const MusicManagement: React.FC = () => {
       render: (row) => (
         <span onClick={(e) => e.stopPropagation()}>
           <Checkbox
-            checked={selectedRows.has(row.id)}
-            onChange={(checked) => handleRowSelect(row.id, checked)}
+            checked={isSelected(row.id)}
+            onChange={() => handleSelectOne(row.id)}
           />
         </span>
       ),
@@ -202,7 +153,7 @@ const MusicManagement: React.FC = () => {
       key: 'instrument',
       label: '악기',
       width: '120px',
-      render: (row) => instrumentLabels[row.instrument] || row.instrument,
+      render: (row) => getInstrumentLabel(row.instrument),
     },
     {
       key: 'artist',
@@ -227,45 +178,39 @@ const MusicManagement: React.FC = () => {
     },
   ];
 
-  return (
-    <div className="music-management">
-      <div className="music-management__tabs">
-        <Tabs
-          items={instrumentTabs}
-          activeTab={selectedInstrument}
-          onChange={(tabId) => handleInstrumentChange(tabId as MusicInstrument)}
-          rightActions={
-            <div className="admin-actions">
-              <button
-                className="admin-btn admin-btn--primary"
-                onClick={() => setIsUploadModalOpen(true)}
-              >
-                악보 등록
-              </button>
-              <button
-                className="admin-btn admin-btn--outline"
-                onClick={handleDeleteClick}
-                disabled={selectedRows.size === 0}
-              >
-                삭제
-              </button>
-            </div>
-          }
-        />
-      </div>
+  const rightActions = (
+    <div className="music-management__actions">
+      <button
+        className="admin-btn admin-btn--primary"
+        onClick={() => setIsUploadModalOpen(true)}
+      >
+        악보 등록
+      </button>
+      <button
+        className="admin-btn admin-btn--outline"
+        onClick={handleDeleteClick}
+        disabled={!hasSelection}
+      >
+        삭제 ({selectedCount})
+      </button>
+    </div>
+  );
 
-      <div className="music-management__table">
-        <Table
-          columns={columns}
-          data={musicData}
-          keyExtractor={(row) => row.id}
-          emptyMessage="등록된 악보가 없습니다."
-          className="table--compact"
-          showSelectAll={true}
-          isAllSelected={isAllSelected}
-          onSelectAll={handleSelectAll}
-        />
-      </div>
+  return (
+    <div className="music-management admin-page">
+      <AdminPageLayout
+        tabs={instrumentTabs}
+        activeTab={selectedInstrument}
+        onTabChange={(tabId) => handleInstrumentChange(tabId as MusicInstrument)}
+        rightActions={rightActions}
+        columns={columns}
+        data={musicData}
+        keyExtractor={(music) => music?.id || 0}
+        showSelectAll={true}
+        selectedItems={selectedIds}
+        onSelectAll={handleSelectAll}
+        emptyMessage="등록된 악보가 없습니다."
+      />
 
       {isUploadModalOpen && (
         <div className="music-management__modal-overlay" onClick={() => setIsUploadModalOpen(false)}>
@@ -361,47 +306,14 @@ const MusicManagement: React.FC = () => {
         </div>
       )}
 
-      {isDeleteModalOpen && (
-        <div className="music-management__modal-overlay" onClick={() => setIsDeleteModalOpen(false)}>
-          <div className="music-management__modal music-management__modal--delete" onClick={(e) => e.stopPropagation()}>
-            <div className="music-management__modal-header">
-              <h2>삭제 확인</h2>
-              <Button
-                variant="ghost"
-                size="small"
-                onClick={() => setIsDeleteModalOpen(false)}
-                className="music-management__modal-close"
-              >
-                ×
-              </Button>
-            </div>
-            <div className="music-management__modal-content">
-              <div className="music-management__delete-message">
-                <p className="music-management__delete-text">
-                  선택된 <strong>{selectedRows.size}개</strong>의 악보를 삭제하시겠습니까?
-                </p>
-                <p className="music-management__delete-warning">
-                  이 작업은 되돌릴 수 없습니다.
-                </p>
-              </div>
-              <div className="music-management__modal-actions">
-                <Button
-                  variant="secondary"
-                  onClick={() => setIsDeleteModalOpen(false)}
-                >
-                  취소
-                </Button>
-                <Button
-                  variant="danger"
-                  onClick={handleDeleteConfirmed}
-                >
-                  삭제
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      <DeleteModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={handleDeleteConfirmed}
+        title="삭제 확인"
+        message={`${selectedCount}개의 악보를 삭제하시겠습니까?`}
+        isLoading={isDeleting}
+      />
     </div>
   );
 };

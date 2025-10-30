@@ -1,5 +1,4 @@
 import React, { ReactNode } from 'react';
-import '../../style/components/ui/Tabs.scss';
 
 export interface TabItem {
   id: string;

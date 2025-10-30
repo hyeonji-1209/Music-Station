@@ -1,5 +1,4 @@
 import React from 'react';
-import '../../style/components/layout/AdminSide.scss';
 
 export type AdminMenuType = 'music' | 'users' | 'payments' | 'requests';
 

@@ -3,7 +3,6 @@ import { OpenSheetMusicDisplay } from 'opensheetmusicdisplay';
 import { InstrumentType } from '../components/layout/Side';
 import { getInstrumentLabel } from '../utils/instruments';
 import { ADMIN_OSMD_CONFIG } from '../utils/osmd';
-import '../style/screens/Admin.scss';
 
 interface AdminProps {
   selectedInstrument: InstrumentType;

@@ -1,10 +1,8 @@
-@import '../../components/admin/admin-buttons';
+@import '../../variables';
+@import '../../mixins';
 
 .user-management {
-  padding: 20px;
-  background: #fff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  @include admin-page;
 
   &__tabs {
     margin-bottom: 20px;
@@ -13,7 +11,7 @@
   &__table {}
 
   &__actions {
-    @extend .admin-actions;
+    @include actions-container;
   }
 
   &__name {
@@ -22,70 +20,44 @@
   }
 
   &__payment-type {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-
     &--basic {
-      background-color: #e5e7eb;
-      color: #374151;
+      @include badge(#e5e7eb, #374151);
     }
 
     &--premium {
-      background-color: #fef3c7;
-      color: #92400e;
+      @include badge(#fef3c7, #92400e);
     }
 
     &--enterprise {
-      background-color: #dbeafe;
-      color: #1e40af;
+      @include badge(#dbeafe, #1e40af);
     }
   }
 
   &__payment-method {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-
     &--card {
-      background-color: #fef3c7;
-      color: #92400e;
+      @include badge(#fef3c7, #92400e);
     }
 
     &--bank_transfer {
-      background-color: #dbeafe;
-      color: #1e40af;
+      @include badge(#dbeafe, #1e40af);
     }
 
     &--virtual_account {
-      background-color: #e0e7ff;
-      color: #3730a3;
+      @include badge(#e0e7ff, #3730a3);
     }
 
     &--none {
-      background-color: #f3f4f6;
-      color: #6b7280;
+      @include badge(#f3f4f6, #6b7280);
     }
   }
 
   &__role {
-    padding: 0.25rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: 600;
-
     &--user {
-      background-color: #f3f4f6;
-      color: #6b7280;
+      @include badge(#f3f4f6, #6b7280);
     }
 
     &--admin {
-      background-color: #fef2f2;
-      color: #dc2626;
+      @include badge(#fef2f2, #dc2626);
     }
   }
 }

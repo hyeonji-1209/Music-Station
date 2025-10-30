@@ -3,7 +3,6 @@ import { AdminSide, type AdminMenuType } from '../../components';
 import MusicManagement from './MusicManagement';
 import UserManagement from './UserManagement';
 import PaymentManagement from './PaymentManagement';
-import '../../style/screens/admin/AdminDashboard.scss';
 
 const AdminDashboard: React.FC = () => {
   const [selectedMenu, setSelectedMenu] = useState<AdminMenuType>('music');

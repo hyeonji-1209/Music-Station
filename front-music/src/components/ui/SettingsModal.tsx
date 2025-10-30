@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import '../../style/features/settings/SettingsModal.scss';
 
 interface SettingsModalProps {
   isOpen: boolean;

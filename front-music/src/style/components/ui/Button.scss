@@ -1,28 +1,39 @@
-@import '../../mixins/button';
+@import '../../variables';
+@import '../../mixins';
 
 .btn {
   @include button-base;
+  gap: $spacing-sm;
 
   // Size variants
   &--small {
-    @include button-size(0.375rem, 0.75rem, 0.8rem, 32px);
+    padding: $spacing-xs $spacing-md;
+    font-size: $font-xs;
+    min-height: 32px;
   }
 
   &--medium {
-    @include button-size(0.5rem, 1.25rem, 0.9rem, 40px);
+    padding: $spacing-sm $spacing-xl;
+    font-size: $font-md;
+    min-height: 40px;
   }
 
   &--large {
-    @include button-size(0.75rem, 1.5rem, 1rem, 48px);
+    padding: $spacing-md $spacing-2xl;
+    font-size: $font-base;
+    min-height: 48px;
   }
 
   // Variant styles
   &--primary {
-    @include button-variant(#000000, #ffffff);
+    background: $primary-color;
+    color: $background-color;
+    border: 2px solid $primary-color;
 
     &:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      background: $secondary-color;
+      border-color: $secondary-color;
+      @include hover-lift;
     }
 
     &:active:not(:disabled) {
@@ -31,15 +42,25 @@
   }
 
   &--secondary {
-    @include button-variant(#f5f5f5, #000000, #e0e0e0, #e8e8e8, #000000, #000000);
+    background: $background-light;
+    color: $text-color;
+    border: 2px solid $border-color;
+
+    &:hover:not(:disabled) {
+      background: darken($background-light, 5%);
+      border-color: $text-color;
+    }
   }
 
   &--outline {
-    @include button-variant(transparent, #000000, #000000, #000000, #ffffff, #000000);
+    background: transparent;
+    color: $primary-color;
+    border: 2px solid $primary-color;
 
     &:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      background: $primary-color;
+      color: $background-color;
+      @include hover-lift;
     }
 
     &:active:not(:disabled) {
@@ -48,20 +69,68 @@
   }
 
   &--ghost {
-    @include button-variant(transparent, #000000, transparent, #f5f5f5, #000000, transparent);
+    background: transparent;
+    color: $text-color;
+    border: 2px solid transparent;
+
+    &:hover:not(:disabled) {
+      background: $background-light;
+    }
   }
 
   &--danger {
-    @include button-variant(#000000, #ffffff);
+    background: #dc2626;
+    color: $background-color;
+    border: 2px solid #dc2626;
 
     &:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+      background: #b91c1c;
+      border-color: #b91c1c;
+      @include hover-lift;
     }
 
     &:active:not(:disabled) {
       transform: translateY(0);
     }
+  }
+
+  &--success {
+    background: #10b981;
+    color: $background-color;
+    border: 2px solid #10b981;
+
+    &:hover:not(:disabled) {
+      background: #059669;
+      border-color: #059669;
+      @include hover-lift;
+    }
+  }
+
+  &--warning {
+    background: #f59e0b;
+    color: $background-color;
+    border: 2px solid #f59e0b;
+
+    &:hover:not(:disabled) {
+      background: #d97706;
+      border-color: #d97706;
+      @include hover-lift;
+    }
+  }
+
+  &--full-width {
+    width: 100%;
+  }
+
+  &--disabled,
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  &--loading {
+    pointer-events: none;
   }
 
   &__content {
@@ -70,27 +139,103 @@
   }
 
   &__icon {
-    @include button-icon;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    &--left {
+      margin-right: $spacing-xs;
+    }
+
+    &--right {
+      margin-left: $spacing-xs;
+    }
   }
 
   &__spinner {
-    @include button-spinner;
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
   }
 }
 
-// 반응형 디자인
-@media (max-width: 768px) {
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Admin button alias for backward compatibility
+.admin-btn {
+  @extend .btn;
+
+  &--primary {
+    @extend .btn--primary;
+  }
+
+  &--outline {
+    @extend .btn--outline;
+  }
+
+  &--danger {
+    @extend .btn--danger;
+  }
+
+  &--success {
+    @extend .btn--success;
+  }
+
+  &--warning {
+    @extend .btn--warning;
+  }
+
+  &__icon {
+    @extend .btn__icon;
+  }
+
+  &__spinner {
+    @extend .btn__spinner;
+  }
+}
+
+// Admin actions container
+.admin-actions {
+  display: flex;
+  gap: $spacing-md;
+  align-items: center;
+  flex-wrap: wrap;
+
+  @media (max-width: $breakpoint-mobile) {
+    flex-direction: column;
+
+    .admin-btn,
+    .btn {
+      width: 100%;
+    }
+  }
+}
+
+@include mobile {
   .btn {
     &--small {
-      @include button-size(0.3rem, 0.6rem, 0.75rem, 28px);
+      padding: $spacing-xs $spacing-sm;
+      font-size: $font-xs;
+      min-height: 28px;
     }
 
     &--medium {
-      @include button-size(0.4rem, 1rem, 0.85rem, 36px);
+      padding: $spacing-sm $spacing-lg;
+      font-size: $font-sm;
+      min-height: 36px;
     }
 
     &--large {
-      @include button-size(0.6rem, 1.2rem, 0.9rem, 44px);
+      padding: $spacing-md $spacing-xl;
+      font-size: $font-md;
+      min-height: 44px;
     }
   }
 }

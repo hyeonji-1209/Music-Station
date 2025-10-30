@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { OpenSheetMusicDisplay } from 'opensheetmusicdisplay';
 import { Button } from '../../components';
 import { OSMD_CONFIG } from '../../utils/osmd';
-import '../../style/screens/admin/SheetMusicViewer.scss';
 
 const SheetMusicViewer: React.FC = () => {
   const [searchParams] = useSearchParams();

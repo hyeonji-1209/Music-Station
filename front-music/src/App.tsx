@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import './style/index.scss';
 import * as Screens from './screens';
-import { Header, Side, AdminSide } from './components';
-import { SettingsModal } from './features/settings';
+import { Header, Side } from './components';
+import SettingsModal from './components/ui/SettingsModal';
 
 function AppContent() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);

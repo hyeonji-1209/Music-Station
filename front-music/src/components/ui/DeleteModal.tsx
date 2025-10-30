@@ -1,22 +1,31 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import Button from './Button';
-import '../../style/components/ui/DeleteModal.scss';
+
+type DeleteModalAction = {
+  label: string;
+  onClick: () => void;
+  variant?: 'primary' | 'secondary' | 'outline' | 'danger';
+};
 
 interface DeleteModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm?: () => void;
+
+  // Content
   title?: string;
-  message?: string;
-  itemCount?: number;
-  itemName?: string;
-  isLoading?: boolean;
+  message: string;
+  icon?: ReactNode;
   items?: string[];
+  warning?: string;
+
+  // Actions
   confirmLabel?: string;
   cancelLabel?: string;
-  secondaryActionLabel?: string;
-  onSecondaryAction?: () => void;
-  hideConfirm?: boolean;
+  customActions?: DeleteModalAction[];
+
+  // State
+  isLoading?: boolean;
 }
 
 const DeleteModal: React.FC<DeleteModalProps> = ({
@@ -25,23 +34,15 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
   onConfirm,
   title = '삭제 확인',
   message,
-  itemCount = 1,
-  itemName = '항목',
-  isLoading = false,
+  icon = '⚠️',
   items,
+  warning = '이 작업은 되돌릴 수 없습니다.',
   confirmLabel = '삭제',
   cancelLabel = '취소',
-  secondaryActionLabel,
-  onSecondaryAction,
-  hideConfirm = false
+  customActions,
+  isLoading = false,
 }) => {
   if (!isOpen) return null;
-
-  const defaultMessage = itemCount > 1
-    ? `${itemCount}개의 ${itemName}을(를) 삭제하시겠습니까?`
-    : `${itemName}을(를) 삭제하시겠습니까?`;
-
-  const displayMessage = message || defaultMessage;
 
   return (
     <div className="delete-modal-overlay">
@@ -58,18 +59,16 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
         </div>
 
         <div className="delete-modal__content">
-          <div className="delete-modal__icon">⚠️</div>
-          <p className="delete-modal__message">{displayMessage}</p>
+          {icon && <div className="delete-modal__icon">{icon}</div>}
+          <p className="delete-modal__message">{message}</p>
           {items && items.length > 0 && (
             <ul className="delete-modal__list">
-              {items.map((it, idx) => (
-                <li key={idx} className="delete-modal__list-item">- {it}</li>
+              {items.map((item, idx) => (
+                <li key={idx} className="delete-modal__list-item">- {item}</li>
               ))}
             </ul>
           )}
-          <p className="delete-modal__warning">
-            이 작업은 되돌릴 수 없습니다.
-          </p>
+          {warning && <p className="delete-modal__warning">{warning}</p>}
         </div>
 
         <div className="delete-modal__actions">
@@ -80,16 +79,19 @@ const DeleteModal: React.FC<DeleteModalProps> = ({
           >
             {cancelLabel}
           </Button>
-          {secondaryActionLabel && onSecondaryAction && (
+
+          {customActions?.map((action, idx) => (
             <Button
-              variant="secondary"
-              onClick={onSecondaryAction}
+              key={idx}
+              variant={action.variant || 'secondary'}
+              onClick={action.onClick}
               disabled={isLoading}
             >
-              {secondaryActionLabel}
+              {action.label}
             </Button>
-          )}
-          {!hideConfirm && (
+          ))}
+
+          {onConfirm && (
             <Button
               variant="danger"
               onClick={onConfirm}

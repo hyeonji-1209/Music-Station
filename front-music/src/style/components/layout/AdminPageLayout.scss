@@ -1,0 +1,14 @@
+@import '../../variables';
+@import '../../mixins';
+
+.admin-page {
+  @include admin-page;
+
+  &__tabs {
+    margin-bottom: $spacing-lg;
+  }
+
+  &__table {
+    // Table 스타일은 Table.scss에서 관리
+  }
+}

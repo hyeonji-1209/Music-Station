@@ -1,5 +1,4 @@
 import React from 'react';
-import '../../style/components/layout/Header.scss';
 
 interface HeaderProps {
   onProfileClick: () => void;

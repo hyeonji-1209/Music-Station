@@ -1,109 +1,23 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { OpenSheetMusicDisplay } from 'opensheetmusicdisplay';
+import React, { useState } from 'react';
 import * as Tone from 'tone';
 import DrumKit from '../components/DrumKit';
-import '../style/screens/Home.scss';
-import { OSMD_CONFIG } from '../utils/osmd';
+import { BpmControl, MusicStaff, DrumLegend } from '../components/music';
+import { useMusicPlayer } from '../hooks/useMusicPlayer';
+import { useDrumSampler } from '../hooks/useDrumSampler';
+import { calculateBeatDuration } from '../utils/music';
+import { DRUM_NOTES } from '../constants/notes';
 
-const drumNotes = [
-  { drum: 'kick' }, { drum: 'snare' }, { drum: 'hihat' }, { drum: 'snare' },
-  { drum: 'kick' }, { drum: 'hihat' }, { drum: 'snare' }, { drum: 'hihat' },
-  { drum: 'kick' }, { drum: 'snare' }, { drum: 'kick' }, { drum: 'snare' },
-  { drum: 'kick' }, { drum: 'hihat' }, { drum: 'snare' },
-];
+const drumNotes = DRUM_NOTES.map(note => ({ drum: note.drum!, duration: 500 }));
 
 const DrumPage: React.FC = () => {
-  const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
-  const drumRef = useRef<Tone.Players | null>(null);
-  const isMountedRef = useRef(true);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentNoteIndex, setCurrentNoteIndex] = useState(-1);
   const [bpm, setBpm] = useState(120);
 
-  useEffect(() => {
-    isMountedRef.current = true;
+  const { isPlaying, setIsPlaying, currentNoteIndex, setCurrentNoteIndex } = useMusicPlayer({
+    musicXmlPath: '/musicxml/drum.xml',
+    instrumentType: 'drum'
+  });
 
-    const loadMusicXML = async () => {
-      if (!isMountedRef.current) return;
-
-      const container = document.getElementById('osmd-container');
-      if (!container) {
-        console.error('osmd-container not found');
-        return;
-      }
-
-      // 기존 OSMD 인스턴스 완전히 정리
-      if (osmdRef.current) {
-        try {
-          osmdRef.current.clear();
-          osmdRef.current = null;
-        } catch (e) {
-          console.log('Error clearing OSMD:', e);
-        }
-      }
-
-      // 컨테이너 완전히 클리어
-      container.innerHTML = '';
-
-      try {
-        console.log('Loading Drum MusicXML...');
-
-        // 새로운 OSMD 인스턴스 생성
-        const osmd = new OpenSheetMusicDisplay(container, OSMD_CONFIG);
-        console.log('OSMD instance created');
-
-        await osmd.load('/musicxml/drum.xml');
-        console.log('Drum MusicXML loaded');
-
-        if (!isMountedRef.current) return;
-
-        await osmd.render();
-        console.log('OSMD rendered');
-
-        if (!isMountedRef.current) return;
-
-        osmdRef.current = osmd;
-
-        // 렌더링 후 컨테이너 확인
-        console.log('Container children:', container.children.length);
-      } catch (error) {
-        console.error('Error loading Drum MusicXML:', error);
-      }
-    };
-
-    // 약간의 지연을 두고 로드
-    const timeoutId = setTimeout(loadMusicXML, 200);
-
-    // cleanup 함수
-    return () => {
-      isMountedRef.current = false;
-      clearTimeout(timeoutId);
-
-      if (osmdRef.current) {
-        try {
-          osmdRef.current.clear();
-        } catch (e) {
-          console.log('Error clearing OSMD on cleanup:', e);
-        }
-        osmdRef.current = null;
-      }
-    };
-
-    drumRef.current = new Tone.Players({
-      urls: {
-        kick: "https://tonejs.github.io/audio/drum-samples/acoustic-kit/kick.mp3",
-        snare: "https://tonejs.github.io/audio/drum-samples/acoustic-kit/snare.mp3",
-        hihat: "https://tonejs.github.io/audio/drum-samples/acoustic-kit/hihat.mp3",
-      }
-    }).toDestination();
-
-    return () => {
-      if (drumRef.current) {
-        drumRef.current.disconnect();
-        drumRef.current.dispose();
-      }
-    };
-  }, []);
+  const drumRef = useDrumSampler();
 
   const playDrums = async () => {
     if (!drumRef.current) return;
@@ -115,15 +29,17 @@ const DrumPage: React.FC = () => {
     setIsPlaying(true);
     setCurrentNoteIndex(0);
 
-    const beatDuration = 60 / bpm;
-    let currentTime = Tone.now();
+    const beatDuration = calculateBeatDuration(bpm);
+    const currentTime = Tone.now();
 
     drumNotes.forEach((drumNote, index) => {
+      const noteOffset = index * beatDuration;
+
       setTimeout(() => {
         setCurrentNoteIndex(index);
-      }, (currentTime - Tone.now() + index * beatDuration) * 1000);
+      }, (currentTime - Tone.now() + noteOffset) * 1000);
 
-      drumRef.current?.player(drumNote.drum).start(currentTime + index * beatDuration);
+      drumRef.current?.player(drumNote.drum).start(currentTime + noteOffset);
     });
 
     const totalDuration = drumNotes.length * beatDuration;
@@ -140,30 +56,7 @@ const DrumPage: React.FC = () => {
         <h1 className="home__title">드럼 연습</h1>
 
         <div className="home__controls">
-          <div className="home__bpm-selector">
-            <label className="home__label">
-              BPM: {bpm}
-              <div className="home__bpm-control">
-                <input
-                  type="range"
-                  min="60"
-                  max="200"
-                  value={bpm}
-                  onChange={(e) => setBpm(Number(e.target.value))}
-                  className="home__bpm-slider"
-                />
-                <input
-                  type="number"
-                  min="60"
-                  max="200"
-                  value={bpm}
-                  onChange={(e) => setBpm(Number(e.target.value))}
-                  className="home__bpm-input"
-                />
-              </div>
-            </label>
-          </div>
-
+          <BpmControl bpm={bpm} onBpmChange={setBpm} />
           <button
             onClick={playDrums}
             disabled={isPlaying}
@@ -173,31 +66,9 @@ const DrumPage: React.FC = () => {
           </button>
         </div>
 
-        <div className="home__drum-legend">
-          <h3>드럼 악보 기호</h3>
-          <div className="home__drum-legend-items">
-            <div className="home__drum-legend-item">
-              <span className="home__drum-legend-symbol">C (X)</span>
-              <span className="home__drum-legend-label">Bass Drum</span>
-            </div>
-            <div className="home__drum-legend-item">
-              <span className="home__drum-legend-symbol">E (○)</span>
-              <span className="home__drum-legend-label">Snare</span>
-            </div>
-            <div className="home__drum-legend-item">
-              <span className="home__drum-legend-symbol">G (X)</span>
-              <span className="home__drum-legend-label">Hi-Hat</span>
-            </div>
-          </div>
-        </div>
+        <DrumLegend />
 
-        <div className="musical-staff">
-          <div id="osmd-container">
-            <p style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
-              드럼 악보를 로딩 중...
-            </p>
-          </div>
-        </div>
+        <MusicStaff loadingMessage="드럼 악보를 로딩 중..." />
 
         <DrumKit
           activeDrum={currentNoteIndex >= 0 ? drumNotes[currentNoteIndex].drum : undefined}
