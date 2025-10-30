@@ -21,27 +21,65 @@ type KeyType = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';
 const PianoPage: React.FC = () => {
   const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
   const pianoRef = useRef<Tone.Sampler | null>(null);
+  const isMountedRef = useRef(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentNoteIndex, setCurrentNoteIndex] = useState(-1);
   const [selectedKey, setSelectedKey] = useState<KeyType>('C');
   const [bpm, setBpm] = useState(120);
 
   useEffect(() => {
+    isMountedRef.current = true;
+
     const loadMusicXML = async () => {
+      if (!isMountedRef.current) return;
+
       const container = document.getElementById('osmd-container');
-      if (!container) return;
+      if (!container) {
+        console.error('osmd-container not found');
+        return;
+      }
+
+      // 기존 OSMD 인스턴스 완전히 정리
+      if (osmdRef.current) {
+        try {
+          osmdRef.current.clear();
+          osmdRef.current = null;
+        } catch (e) {
+          console.log('Error clearing OSMD:', e);
+        }
+      }
+
+      // 컨테이너 완전히 클리어
+      container.innerHTML = '';
 
       try {
+        console.log('Loading Piano MusicXML...');
+
+        // 새로운 OSMD 인스턴스 생성
         const osmd = new OpenSheetMusicDisplay(container, OSMD_CONFIG);
+        console.log('OSMD instance created');
+
         await osmd.load('/musicxml/twinkle.xml');
-        osmd.render();
+        console.log('Piano MusicXML loaded');
+
+        if (!isMountedRef.current) return;
+
+        await osmd.render();
+        console.log('OSMD rendered');
+
+        if (!isMountedRef.current) return;
+
         osmdRef.current = osmd;
+
+        // 렌더링 후 컨테이너 확인
+        console.log('Container children:', container.children.length);
       } catch (error) {
-        console.error('Error loading MusicXML:', error);
+        console.error('Error loading Piano MusicXML:', error);
       }
     };
 
-    loadMusicXML();
+    // 약간의 지연을 두고 로드
+    const timeoutId = setTimeout(loadMusicXML, 200);
 
     pianoRef.current = new Tone.Sampler({
       urls: {
@@ -58,7 +96,20 @@ const PianoPage: React.FC = () => {
       baseUrl: "https://tonejs.github.io/audio/salamander/"
     }).toDestination();
 
+    // cleanup 함수
     return () => {
+      isMountedRef.current = false;
+      clearTimeout(timeoutId);
+
+      if (osmdRef.current) {
+        try {
+          osmdRef.current.clear();
+        } catch (e) {
+          console.log('Error clearing OSMD on cleanup:', e);
+        }
+        osmdRef.current = null;
+      }
+
       if (pianoRef.current) {
         pianoRef.current.disconnect();
         pianoRef.current.dispose();
@@ -177,7 +228,11 @@ const PianoPage: React.FC = () => {
         </div>
 
         <div className="musical-staff">
-          <div id="osmd-container"></div>
+          <div id="osmd-container">
+            <p style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
+              악보를 로딩 중...
+            </p>
+          </div>
         </div>
 
         <Piano

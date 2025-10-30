@@ -1,0 +1,32 @@
+@import '../../mixins/button';
+
+// 커스텀 버튼 예시 - mixin 재사용
+.custom-btn {
+  @include button-base;
+  @include button-size(0.5rem, 1rem, 0.875rem, 38px);
+  @include button-variant(#6366f1, #ffffff, #6366f1, #4f46e5, #ffffff, #4f46e5);
+
+  border-radius: 8px;
+  font-weight: 500;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+  }
+
+  &--success {
+    @include button-variant(#10b981, #ffffff, #10b981, #059669, #ffffff, #059669);
+  }
+
+  &--warning {
+    @include button-variant(#f59e0b, #ffffff, #f59e0b, #d97706, #ffffff, #d97706);
+  }
+
+  &__icon {
+    @include button-icon;
+  }
+
+  &__spinner {
+    @include button-spinner;
+  }
+}

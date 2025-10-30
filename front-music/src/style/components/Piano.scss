@@ -1,18 +1,20 @@
 .piano {
   width: 100%;
-  margin: 2rem auto;
-  padding: 2rem;
-  background: linear-gradient(to bottom, #2c3e50 0%, #34495e 100%);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  margin: 0.5rem 0;
+  padding: 0.75rem;
+  background: #f5f5f5;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e0e0e0;
 
   &__scroll-container {
     overflow-x: auto;
     overflow-y: hidden;
-    background: #1a1a1a;
-    border-radius: 8px;
-    padding: 1rem;
-    box-shadow: inset 0 5px 15px rgba(0, 0, 0, 0.5);
+    background: #ffffff;
+    border-radius: 6px;
+    padding: 0.75rem;
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e0e0e0;
 
     // 스크롤바 스타일링
     &::-webkit-scrollbar {
@@ -20,16 +22,16 @@
     }
 
     &::-webkit-scrollbar-track {
-      background: #0a0a0a;
+      background: #f5f5f5;
       border-radius: 5px;
     }
 
     &::-webkit-scrollbar-thumb {
-      background: #667eea;
+      background: #000000;
       border-radius: 5px;
 
       &:hover {
-        background: #764ba2;
+        background: #333333;
       }
     }
   }
@@ -55,24 +57,24 @@
     &--white {
       width: 50px;
       height: 180px;
-      background: linear-gradient(to bottom, #ffffff 0%, #f0f0f0 100%);
-      border: 2px solid #333;
+      background: #ffffff;
+      border: 2px solid #000000;
       border-radius: 0 0 8px 8px;
       margin: 0 1px;
-      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
       z-index: 1;
 
       &:hover {
-        background: linear-gradient(to bottom, #f8f8f8 0%, #e8e8e8 100%);
+        background: #f5f5f5;
       }
 
       &.piano__key--active {
-        background: linear-gradient(to bottom, #667eea 0%, #764ba2 100%);
+        background: #000000;
         transform: translateY(3px);
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 
         .piano__key-label {
-          color: white;
+          color: #ffffff;
           font-weight: bold;
         }
       }
@@ -81,24 +83,25 @@
     &--black {
       width: 30px;
       height: 120px;
-      background: linear-gradient(to bottom, #1a1a1a 0%, #000000 100%);
-      border: 2px solid #000;
+      background: #000000;
+      border: 2px solid #000000;
       border-radius: 0 0 4px 4px;
       margin: 0 -16px;
-      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.4);
       z-index: 2;
 
       &:hover {
-        background: linear-gradient(to bottom, #2a2a2a 0%, #0a0a0a 100%);
+        background: #333333;
       }
 
       &.piano__key--active {
-        background: linear-gradient(to bottom, #2196F3 0%, #1976D2 100%);
+        background: #ffffff;
+        border-color: #000000;
         transform: translateY(3px);
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 
         .piano__key-label {
-          color: white;
+          color: #000000;
           font-weight: bold;
         }
       }
@@ -112,7 +115,7 @@
 
   &__key-label {
     font-size: 0.9rem;
-    color: #333;
+    color: #000000;
     font-weight: 500;
     text-align: center;
     pointer-events: none;
@@ -122,7 +125,8 @@
 // 반응형 디자인
 @media (max-width: 768px) {
   .piano {
-    padding: 1rem;
+    padding: 0.5rem;
+    margin: 0.25rem 0;
 
     &__keys {
       height: 150px;

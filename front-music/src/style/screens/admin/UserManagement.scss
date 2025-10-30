@@ -1,0 +1,147 @@
+@import '../../components/admin/admin-buttons';
+
+.user-management {
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  &__tabs {
+    margin-bottom: 20px;
+  }
+
+  &__table {}
+
+  &__actions {
+    @extend .admin-actions;
+  }
+
+  &__name {
+    font-weight: 600;
+    color: #000000;
+  }
+
+  &__payment-type {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+
+    &--basic {
+      background-color: #e5e7eb;
+      color: #374151;
+    }
+
+    &--premium {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    &--enterprise {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+  }
+
+  &__payment-method {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    &--card {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+
+    &--bank_transfer {
+      background-color: #dbeafe;
+      color: #1e40af;
+    }
+
+    &--virtual_account {
+      background-color: #e0e7ff;
+      color: #3730a3;
+    }
+
+    &--none {
+      background-color: #f3f4f6;
+      color: #6b7280;
+    }
+  }
+
+  &__role {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+
+    &--user {
+      background-color: #f3f4f6;
+      color: #6b7280;
+    }
+
+    &--admin {
+      background-color: #fef2f2;
+      color: #dc2626;
+    }
+  }
+}
+
+// 테이블 스타일 오버라이드는 공통 Table.scss를 사용합니다.
+
+// 반응형
+@media (max-width: 1200px) {
+  .user-management .table {
+
+    &__header-cell,
+    &__cell {
+      font-size: 0.8rem;
+      padding: 0.5rem 0.75rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .user-management {
+    &__container {
+      border-radius: 8px;
+    }
+
+    &__actions {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+
+  .user-management .table {
+
+    &__header-cell,
+    &__cell {
+      font-size: 0.75rem;
+      padding: 0.5rem;
+    }
+
+    &__header-cell:nth-child(4),
+    &__cell:nth-child(4) {
+      display: none;
+    }
+
+    &__header-cell:nth-child(5),
+    &__cell:nth-child(5) {
+      width: 150px;
+    }
+
+    &__header-cell:nth-child(6),
+    &__cell:nth-child(6) {
+      display: none;
+    }
+
+    &__header-cell:nth-child(7),
+    &__cell:nth-child(7) {
+      display: none;
+    }
+  }
+}

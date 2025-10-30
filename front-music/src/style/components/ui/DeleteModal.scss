@@ -1,0 +1,151 @@
+.delete-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.delete-modal {
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.25);
+  max-width: 420px;
+  width: 100%;
+  border: 1px solid #e6e6e6;
+  overflow: hidden;
+  animation: modalSlideIn 0.18s ease-out;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f2f2f2;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #000000;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #666666;
+    cursor: pointer;
+    padding: 0;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #f5f5f5;
+      color: #000000;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__content {
+    padding: 1rem 1.25rem;
+    text-align: center;
+  }
+
+  &__list {
+    margin: 0.5rem 0 0.75rem;
+    padding: 0.25rem 0;
+    list-style: none;
+    text-align: left;
+    max-height: 160px;
+    overflow: auto;
+  }
+
+  &__list-item {
+    font-size: 0.9rem;
+    color: #111111;
+    padding: 2px 0;
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  &__icon {
+    font-size: 1.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__message {
+    font-size: 0.95rem;
+    color: #111111;
+    margin: 0 0 0.5rem 0;
+    line-height: 1.5;
+  }
+
+  &__warning {
+    font-size: 0.8125rem;
+    color: #6b7280;
+    margin: 0;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0.9rem 1.0rem;
+    background-color: #ffffff;
+    border-top: 1px solid #f2f2f2;
+    justify-content: flex-end;
+  }
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+// 반응형
+@media (max-width: 480px) {
+  .delete-modal {
+    margin: 0.5rem;
+    max-width: none;
+
+    &__header,
+    &__content,
+    &__actions {
+      padding-left: 0.9rem;
+      padding-right: 0.9rem;
+    }
+
+    &__actions {
+      flex-direction: column-reverse;
+
+      .btn,
+      button {
+        width: 100%;
+      }
+    }
+  }
+}

@@ -4,73 +4,81 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.7);
+  background-color: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  padding: 2rem;
+  padding: 1rem;
 }
 
 .settings-modal {
   background-color: #ffffff;
-  border-radius: 8px;
+  border-radius: 12px;
   width: 100%;
-  max-width: 900px;
+  max-width: 760px;
+  height: 70vh; // 고정 높이로 탭 전환 시 점프 방지
   max-height: 90vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-  animation: modalFadeIn 0.3s ease-out;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+  border: 1px solid #ededed;
+  animation: modalFadeIn 0.22s ease-out;
 
   &__header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1.5rem 2rem;
-    border-bottom: 1px solid #e0e0e0;
+    position: relative;
+    padding: 1rem 1.25rem 0.75rem;
+    border-bottom: 1px solid #f3f3f3;
     background-color: #ffffff;
+    text-align: center;
   }
 
   &__title {
     color: #000000;
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 1.1rem;
+    font-weight: 700;
     margin: 0;
+    letter-spacing: -0.01em;
   }
 
   &__close {
     background: none;
     border: none;
-    color: #000000;
-    font-size: 2rem;
+    color: #888888;
+    font-size: 1.25rem;
     cursor: pointer;
     padding: 0;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 4px;
     transition: background-color 0.2s ease;
+    position: absolute;
+    top: 8px;
+    right: 8px;
 
     &:hover {
-      background-color: #f0f0f0;
+      background-color: #f6f6f6;
+      color: #000000;
     }
   }
 
   &__body {
     display: flex;
     flex: 1;
+    min-height: 0; // 내부 스크롤을 위해 필요
     overflow: hidden;
   }
 
   &__sidebar {
-    width: 200px;
-    background-color: #f8f8f8;
-    border-right: 1px solid #e0e0e0;
-    padding: 1rem 0;
+    width: 180px;
+    background-color: #fafafa;
+    border-right: 1px solid #f0f0f0;
+    padding: 0.5rem 0.25rem;
     display: flex;
     flex-direction: column;
   }
@@ -78,22 +86,25 @@
   &__menu-item {
     background: none;
     border: none;
-    padding: 1rem 1.5rem;
+    padding: 0.6rem 1rem;
     text-align: left;
-    color: #666666;
-    font-size: 1rem;
+    color: #555555;
+    font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    border-left: 3px solid transparent;
+    border-left: 2px solid transparent;
+    border-radius: 6px;
+    margin: 0.125rem 0.5rem;
 
     &:hover {
-      background-color: #eeeeee;
+      background-color: #f3f3f3;
       color: #000000;
     }
 
     &.active {
-      background-color: #ffffff;
+      background-color: #000000;
       color: #000000;
+      color: #ffffff;
       border-left-color: #000000;
       font-weight: 600;
     }
@@ -101,8 +112,9 @@
 
   &__content {
     flex: 1;
-    padding: 2rem;
+    padding: 1.25rem 1.25rem 1.5rem;
     overflow-y: auto;
+    min-height: 0; // 내부 스크롤을 위해 필요
     color: #000000;
   }
 }
@@ -110,9 +122,9 @@
 // 프로필 설정 스타일
 .settings-profile {
   &__title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0 0 2rem 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0 0 1.25rem 0;
     color: #000000;
   }
 
@@ -120,20 +132,20 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
   }
 
   &__icon-preview {
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    background-color: #f0f0f0;
+    background-color: #f6f6f6;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     overflow: hidden;
-    border: 2px solid #e0e0e0;
+    border: 1px solid #e9e9e9;
   }
 
   &__icon-image {
@@ -143,61 +155,62 @@
   }
 
   &__icon-placeholder {
-    font-size: 4rem;
+    font-size: 3rem;
   }
 
   &__icon-button {
-    padding: 0.75rem 1.5rem;
+    padding: 0.55rem 1rem;
     background-color: #000000;
     color: #ffffff;
     border: none;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 0.875rem;
-    transition: background-color 0.3s ease;
+    font-size: 0.85rem;
+    transition: background-color 0.2s ease;
 
     &:hover {
-      background-color: #333333;
+      background-color: #222222;
     }
   }
 
   &__info {
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
   }
 
   &__info-item {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   &__label {
     display: block;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: #666666;
     margin-bottom: 0.5rem;
   }
 
   &__value {
-    font-size: 1rem;
+    font-size: 0.95rem;
     color: #000000;
-    padding: 0.75rem;
-    background-color: #f8f8f8;
-    border-radius: 4px;
+    padding: 0.6rem 0.75rem;
+    background-color: #fafafa;
+    border-radius: 6px;
+    border: 1px solid #efefef;
   }
 
   &__logout {
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.65rem;
     background-color: #000000;
     color: #ffffff;
     border: none;
-    border-radius: 4px;
-    font-size: 1rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.2s ease;
 
     &:hover {
-      background-color: #333333;
+      background-color: #222222;
     }
   }
 }
@@ -205,34 +218,34 @@
 // Music Setting 스타일
 .settings-music {
   &__title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin: 0 0 2rem 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    margin: 0 0 1.25rem 0;
     color: #000000;
   }
 
   &__section {
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
   }
 
   &__label {
     display: block;
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     font-weight: 600;
     color: #666666;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
   }
 
   &__select {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    font-size: 1rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid #ededed;
+    border-radius: 6px;
+    font-size: 0.95rem;
     background-color: #ffffff;
-    color: #000000;
+    color: #111111;
     cursor: pointer;
-    transition: border-color 0.3s ease;
+    transition: border-color 0.2s ease;
 
     &:focus {
       outline: none;
@@ -242,27 +255,27 @@
 
   &__tempo-slider {
     width: 100%;
-    margin: 1rem 0;
+    margin: 0.75rem 0 0.25rem;
     -webkit-appearance: none;
     appearance: none;
-    height: 6px;
-    background: #e0e0e0;
-    border-radius: 3px;
+    height: 4px;
+    background: #ebebeb;
+    border-radius: 2px;
     outline: none;
 
     &::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 20px;
-      height: 20px;
+      width: 16px;
+      height: 16px;
       background: #000000;
       border-radius: 50%;
       cursor: pointer;
     }
 
     &::-moz-range-thumb {
-      width: 20px;
-      height: 20px;
+      width: 16px;
+      height: 16px;
       background: #000000;
       border-radius: 50%;
       cursor: pointer;
@@ -272,25 +285,25 @@
 
   &__tempo-display {
     text-align: center;
-    font-size: 1.5rem;
-    font-weight: 600;
+    font-size: 0.95rem;
+    font-weight: 700;
     color: #000000;
-    margin-top: 0.5rem;
+    margin-top: 0.25rem;
   }
 
   &__save {
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.65rem;
     background-color: #000000;
     color: #ffffff;
     border: none;
-    border-radius: 4px;
-    font-size: 1rem;
+    border-radius: 6px;
+    font-size: 0.95rem;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: background-color 0.2s ease;
 
     &:hover {
-      background-color: #333333;
+      background-color: #222222;
     }
   }
 }

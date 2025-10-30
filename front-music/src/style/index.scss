@@ -1,5 +1,14 @@
 @use 'Common.scss' as *;
+@use 'mixins/button' as *;
 
 @use 'components/layout/Header.scss' as *;
 @use 'components/layout/Side.scss' as *;
+@use 'components/layout/AdminSide.scss' as *;
 @use 'components/ui/Modal.scss' as *;
+@use 'components/ui/Table.scss' as *;
+@use 'components/ui/Tabs.scss' as *;
+@use 'components/ui/Checkbox.scss' as *;
+@use 'components/ui/Button.scss' as *;
+@use 'components/ui/DeleteModal.scss' as *;
+@use 'components/ui/Notification.scss' as *;
+@use 'screens/admin/UserManagement.scss' as *;

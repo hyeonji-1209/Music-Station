@@ -5,12 +5,23 @@
   flex-direction: column;
 
   &__main {
-    margin-left: 250px; // Side 컴포넌트 너비만큼
-    margin-top: 73px; // Header 높이만큼
-    min-height: calc(100vh - 73px);
+    margin-top: 56px; // Header 높이만큼
+    min-height: calc(100vh - 56px);
     background-color: #ffffff;
     color: #000000;
-    padding: 2rem;
     flex: 1;
+    position: relative;
+
+    &--normal {
+      margin-left: 220px; // Side 컴포넌트 너비만큼
+      padding: 0.5rem;
+    }
+
+    &--admin {
+      margin-left: 0;
+      padding: 0;
+      margin-top: 0; // 관리자 페이지는 헤더가 없음
+      min-height: 100vh; // 전체 높이 사용
+    }
   }
 }

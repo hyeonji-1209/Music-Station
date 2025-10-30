@@ -2,3 +2,8 @@ export { default as Home } from './Home';
 export { default as Admin } from './Admin';
 export { default as PianoPage } from './PianoPage';
 export { default as DrumPage } from './DrumPage';
+export { default as BassPage } from './BassPage';
+export { default as GuitarPage } from './GuitarPage';
+export { default as AdminDashboard } from './admin/AdminDashboard';
+export { default as UserManagement } from './admin/UserManagement';
+export { default as SheetMusicViewer } from './admin/SheetMusicViewer';

@@ -6,6 +6,9 @@ export const OSMD_CONFIG = {
   drawComposer: false,
   drawCredits: false,
   drawingParameters: 'compact' as const,
+  pageFormat: 'A4' as const,
+  pageWidth: 800,
+  pageHeight: 600,
 };
 
 export const ADMIN_OSMD_CONFIG = {

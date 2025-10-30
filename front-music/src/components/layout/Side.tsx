@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import '../../style/components/layout/Side.scss';
 
 export type InstrumentType = 'piano' | 'drum' | 'bass' | 'guitar' | 'vocal';
@@ -17,6 +18,54 @@ const instruments = [
 ];
 
 const Side: React.FC<SideProps> = ({ selectedInstrument = 'piano', onSelectInstrument }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // 현재 경로에 따라 활성 악기 결정
+  const getCurrentInstrument = (): InstrumentType => {
+    switch (location.pathname) {
+      case '/piano':
+        return 'piano';
+      case '/drum':
+        return 'drum';
+      case '/bass':
+        return 'bass';
+      case '/guitar':
+        return 'guitar';
+      case '/vocal':
+        return 'vocal';
+      default:
+        return 'piano';
+    }
+  };
+
+  const currentInstrument = getCurrentInstrument();
+
+  const handleInstrumentClick = (instrument: InstrumentType) => {
+    onSelectInstrument?.(instrument);
+
+    // 악기에 따라 해당 페이지로 이동
+    switch (instrument) {
+      case 'piano':
+        navigate('/piano');
+        break;
+      case 'drum':
+        navigate('/drum');
+        break;
+      case 'bass':
+        navigate('/bass');
+        break;
+      case 'guitar':
+        navigate('/guitar');
+        break;
+      case 'vocal':
+        navigate('/vocal');
+        break;
+      default:
+        navigate('/');
+    }
+  };
+
   return (
     <aside className="side">
       <div className="side__container">
@@ -47,10 +96,9 @@ const Side: React.FC<SideProps> = ({ selectedInstrument = 'piano', onSelectInstr
             {instruments.map((instrument) => (
               <li
                 key={instrument.id}
-                className={`side__instrument ${
-                  selectedInstrument === instrument.id ? 'side__instrument--active' : ''
-                }`}
-                onClick={() => onSelectInstrument?.(instrument.id)}
+                className={`side__instrument ${currentInstrument === instrument.id ? 'side__instrument--active' : ''
+                  }`}
+                onClick={() => handleInstrumentClick(instrument.id)}
               >
                 <span className="side__instrument-label">{instrument.label}</span>
               </li>

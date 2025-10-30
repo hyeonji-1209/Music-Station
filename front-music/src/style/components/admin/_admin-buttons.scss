@@ -1,0 +1,76 @@
+@import '../../mixins/button';
+
+// 관리자 페이지 공통 버튼 스타일
+.admin-btn {
+  @include button-base;
+  @include button-size(0.5rem, 1rem, 0.875rem, 38px);
+
+  &--primary {
+    @include button-variant(#000000, #ffffff);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  &--outline {
+    @include button-variant(transparent, #000000, #000000, #000000, #ffffff, #000000);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+  }
+
+  &--danger {
+    @include button-variant(#dc2626, #ffffff, #dc2626, #b91c1c, #ffffff, #b91c1c);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(220, 38, 38, 0.25);
+    }
+  }
+
+  &--success {
+    @include button-variant(#10b981, #ffffff, #10b981, #059669, #ffffff, #059669);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+    }
+  }
+
+  &--warning {
+    @include button-variant(#f59e0b, #ffffff, #f59e0b, #d97706, #ffffff, #d97706);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.25);
+    }
+  }
+
+  &__icon {
+    @include button-icon;
+  }
+
+  &__spinner {
+    @include button-spinner;
+  }
+}
+
+// 관리자 페이지 액션 버튼 컨테이너
+.admin-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+
+    .admin-btn {
+      width: 100%;
+    }
+  }
+}

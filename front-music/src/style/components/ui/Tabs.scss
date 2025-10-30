@@ -1,0 +1,119 @@
+.tabs {
+  width: 100%;
+
+  &__header {
+    display: flex;
+    gap: 0.25rem;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 4px;
+    position: relative;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .tabs__actions {
+      margin-left: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding-left: 0.5rem;
+      background: #ffffff;
+    }
+  }
+
+  &__tab {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #555555;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+    position: relative;
+    white-space: nowrap;
+
+    &:hover:not(&--disabled):not(&--active) {
+      color: #000000;
+      background-color: #f5f5f5;
+      border-color: #f0f0f0;
+    }
+
+    &--active {
+      color: #ffffff;
+      background-color: #000000;
+      border-color: #000000;
+    }
+
+    &--disabled {
+      color: #bdbdbd;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #000000;
+      outline-offset: 2px;
+    }
+  }
+
+  &__content {
+    padding: 1rem 0 0;
+    background-color: #ffffff;
+  }
+
+  // Underline variant — minimal underline with active accent
+  &--underline {
+    .tabs__header {
+      border: none;
+      border-bottom: 1px solid #e0e0e0;
+      border-radius: 0;
+      padding: 0;
+      gap: 0;
+      background: transparent;
+    }
+
+    .tabs__tab {
+      padding: 0.75rem 1rem;
+      border-radius: 0;
+      border: none;
+      color: #666666;
+      background: transparent;
+      border-bottom: 2px solid transparent;
+
+      &:hover:not(.tabs__tab--disabled):not(.tabs__tab--active) {
+        color: #000000;
+        background: transparent;
+      }
+
+      &--active {
+        color: #000000;
+        border-bottom-color: #000000;
+        background: transparent;
+        box-shadow: none;
+      }
+    }
+  }
+}
+
+// 반응형 디자인
+@media (max-width: 768px) {
+  .tabs {
+    &__tab {
+      padding: 0.45rem 0.85rem;
+      font-size: 0.8rem;
+      flex-shrink: 0;
+    }
+
+    &__content {
+      padding: 0.75rem 0 0;
+    }
+  }
+}

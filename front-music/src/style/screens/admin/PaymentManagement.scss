@@ -1,0 +1,112 @@
+@import '../../components/admin/admin-buttons';
+
+.payment-management {
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  &__tabs {
+    margin-bottom: 20px;
+  }
+
+  &__table {}
+
+  &__actions {
+    @extend .admin-actions;
+  }
+
+  &__payment-type {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+
+    &--basic {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+
+    &--premium {
+      background-color: #f3e5f5;
+      color: #7b1fa2;
+    }
+
+    &--enterprise {
+      background-color: #e8f5e8;
+      color: #388e3c;
+    }
+  }
+
+  &__payment-method {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+
+    &--card {
+      background-color: #fff3e0;
+      color: #f57c00;
+    }
+
+    &--bank_transfer {
+      background-color: #e8f5e8;
+      color: #388e3c;
+    }
+
+    &--virtual_account {
+      background-color: #e3f2fd;
+      color: #1976d2;
+    }
+  }
+
+  &__status {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+
+    &--completed {
+      background-color: #e8f5e8;
+      color: #388e3c;
+    }
+
+    &--pending {
+      background-color: #fff3e0;
+      color: #f57c00;
+    }
+
+    &--failed {
+      background-color: #ffebee;
+      color: #d32f2f;
+    }
+
+    &--refunded {
+      background-color: #f3e5f5;
+      color: #7b1fa2;
+    }
+  }
+}
+
+// 반응형
+@media (max-width: 1200px) {
+  .payment-management {
+    &__table {
+      overflow-x: auto;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .payment-management {
+    padding: 16px;
+
+    &__actions {
+      flex-direction: column;
+
+      .btn {
+        width: 100%;
+      }
+    }
+  }
+}

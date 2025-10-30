@@ -1,0 +1,98 @@
+.notification {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 1001;
+  min-width: 300px;
+  max-width: 400px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: slideInRight 0.3s ease-out;
+
+  &__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+  }
+
+  &__message {
+    flex: 1;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1.4;
+  }
+
+  &__close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 0.75rem;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  // 성공 알림
+  &--success {
+    background-color: #10b981;
+    color: #ffffff;
+    border-left: 4px solid #059669;
+  }
+
+  // 에러 알림
+  &--error {
+    background-color: #ef4444;
+    color: #ffffff;
+    border-left: 4px solid #dc2626;
+  }
+
+  // 정보 알림
+  &--info {
+    background-color: #3b82f6;
+    color: #ffffff;
+    border-left: 4px solid #2563eb;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+// 반응형
+@media (max-width: 480px) {
+  .notification {
+    top: 70px;
+    right: 10px;
+    left: 10px;
+    min-width: auto;
+    max-width: none;
+
+    &__content {
+      padding: 0.875rem 1rem;
+    }
+
+    &__message {
+      font-size: 0.8rem;
+    }
+  }
+}

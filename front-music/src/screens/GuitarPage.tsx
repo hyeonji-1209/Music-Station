@@ -1,23 +1,29 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { OpenSheetMusicDisplay } from 'opensheetmusicdisplay';
 import * as Tone from 'tone';
-import DrumKit from '../components/DrumKit';
 import '../style/screens/Home.scss';
 import { OSMD_CONFIG } from '../utils/osmd';
 
-const drumNotes = [
-  { drum: 'kick' }, { drum: 'snare' }, { drum: 'hihat' }, { drum: 'snare' },
-  { drum: 'kick' }, { drum: 'hihat' }, { drum: 'snare' }, { drum: 'hihat' },
-  { drum: 'kick' }, { drum: 'snare' }, { drum: 'kick' }, { drum: 'snare' },
-  { drum: 'kick' }, { drum: 'hihat' }, { drum: 'snare' },
+const guitarNotes = [
+  { note: 'C4', duration: '4n' }, { note: 'C4', duration: '4n' },
+  { note: 'G4', duration: '4n' }, { note: 'G4', duration: '4n' },
+  { note: 'A4', duration: '4n' }, { note: 'A4', duration: '4n' },
+  { note: 'G4', duration: '2n' },
+  { note: 'F4', duration: '4n' }, { note: 'F4', duration: '4n' },
+  { note: 'E4', duration: '4n' }, { note: 'E4', duration: '4n' },
+  { note: 'D4', duration: '4n' }, { note: 'D4', duration: '4n' },
+  { note: 'C4', duration: '2n' },
 ];
 
-const DrumPage: React.FC = () => {
+type KeyType = 'C' | 'D' | 'E' | 'F' | 'G' | 'A' | 'B';
+
+const GuitarPage: React.FC = () => {
   const osmdRef = useRef<OpenSheetMusicDisplay | null>(null);
-  const drumRef = useRef<Tone.Players | null>(null);
+  const guitarRef = useRef<Tone.Sampler | null>(null);
   const isMountedRef = useRef(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentNoteIndex, setCurrentNoteIndex] = useState(-1);
+  const [selectedKey, setSelectedKey] = useState<KeyType>('C');
   const [bpm, setBpm] = useState(120);
 
   useEffect(() => {
@@ -46,14 +52,14 @@ const DrumPage: React.FC = () => {
       container.innerHTML = '';
 
       try {
-        console.log('Loading Drum MusicXML...');
+        console.log('Loading Guitar MusicXML...');
 
         // 새로운 OSMD 인스턴스 생성
         const osmd = new OpenSheetMusicDisplay(container, OSMD_CONFIG);
         console.log('OSMD instance created');
 
-        await osmd.load('/musicxml/drum.xml');
-        console.log('Drum MusicXML loaded');
+        await osmd.load('/musicxml/guitar.xml');
+        console.log('Guitar MusicXML loaded');
 
         if (!isMountedRef.current) return;
 
@@ -67,12 +73,24 @@ const DrumPage: React.FC = () => {
         // 렌더링 후 컨테이너 확인
         console.log('Container children:', container.children.length);
       } catch (error) {
-        console.error('Error loading Drum MusicXML:', error);
+        console.error('Error loading Guitar MusicXML:', error);
       }
     };
 
     // 약간의 지연을 두고 로드
     const timeoutId = setTimeout(loadMusicXML, 200);
+
+    guitarRef.current = new Tone.Sampler({
+      urls: {
+        C3: "C3.mp3", D3: "D3.mp3", E3: "E3.mp3", F3: "F3.mp3",
+        G3: "G3.mp3", A3: "A3.mp3", B3: "B3.mp3", C4: "C4.mp3",
+        D4: "D4.mp3", E4: "E4.mp3", F4: "F4.mp3", G4: "G4.mp3",
+        A4: "A4.mp3", B4: "B4.mp3", C5: "C5.mp3", D5: "D5.mp3",
+        E5: "E5.mp3", F5: "F5.mp3", G5: "G5.mp3", A5: "A5.mp3"
+      },
+      release: 1,
+      baseUrl: "https://tonejs.github.io/audio/salamander/"
+    }).toDestination();
 
     // cleanup 함수
     return () => {
@@ -87,26 +105,27 @@ const DrumPage: React.FC = () => {
         }
         osmdRef.current = null;
       }
-    };
 
-    drumRef.current = new Tone.Players({
-      urls: {
-        kick: "https://tonejs.github.io/audio/drum-samples/acoustic-kit/kick.mp3",
-        snare: "https://tonejs.github.io/audio/drum-samples/acoustic-kit/snare.mp3",
-        hihat: "https://tonejs.github.io/audio/drum-samples/acoustic-kit/hihat.mp3",
-      }
-    }).toDestination();
-
-    return () => {
-      if (drumRef.current) {
-        drumRef.current.disconnect();
-        drumRef.current.dispose();
+      if (guitarRef.current) {
+        guitarRef.current.disconnect();
+        guitarRef.current.dispose();
       }
     };
   }, []);
 
-  const playDrums = async () => {
-    if (!drumRef.current) return;
+  const transposeNote = (note: string, fromKey: string, toKey: string): string => {
+    const keyOrder = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+    const fromIndex = keyOrder.indexOf(fromKey);
+    const toIndex = keyOrder.indexOf(toKey);
+    const diff = toIndex - fromIndex;
+
+    const noteIndex = keyOrder.indexOf(note[0]);
+    const newIndex = (noteIndex + diff + keyOrder.length) % keyOrder.length;
+    return keyOrder[newIndex] + note.slice(1);
+  };
+
+  const playMelody = async () => {
+    if (!guitarRef.current) return;
 
     if (Tone.getContext().state !== 'running') {
       await Tone.start();
@@ -118,15 +137,25 @@ const DrumPage: React.FC = () => {
     const beatDuration = 60 / bpm;
     let currentTime = Tone.now();
 
-    drumNotes.forEach((drumNote, index) => {
+    guitarNotes.forEach((noteObj, index) => {
+      const transposedNote = transposeNote(noteObj.note, 'C', selectedKey);
+      const noteDuration = noteObj.duration === '2n' ? beatDuration * 2 : beatDuration;
+
       setTimeout(() => {
         setCurrentNoteIndex(index);
-      }, (currentTime - Tone.now() + index * beatDuration) * 1000);
+      }, (currentTime - Tone.now() + (index > 0 ? guitarNotes.slice(0, index).reduce((sum, n) =>
+        sum + (n.duration === '2n' ? beatDuration * 2 : beatDuration), 0) : 0)) * 1000);
 
-      drumRef.current?.player(drumNote.drum).start(currentTime + index * beatDuration);
+      guitarRef.current?.triggerAttackRelease(
+        transposedNote,
+        noteObj.duration,
+        currentTime + (index > 0 ? guitarNotes.slice(0, index).reduce((sum, n) =>
+          sum + (n.duration === '2n' ? beatDuration * 2 : beatDuration), 0) : 0)
+      );
     });
 
-    const totalDuration = drumNotes.length * beatDuration;
+    const totalDuration = guitarNotes.reduce((sum, n) =>
+      sum + (n.duration === '2n' ? beatDuration * 2 : beatDuration), 0);
 
     setTimeout(() => {
       setIsPlaying(false);
@@ -137,9 +166,28 @@ const DrumPage: React.FC = () => {
   return (
     <div className="home">
       <div className="home__container">
-        <h1 className="home__title">드럼 연습</h1>
+        <h1 className="home__title">기타 연습</h1>
 
         <div className="home__controls">
+          <div className="home__key-selector">
+            <label className="home__label">
+              조성:
+              <select
+                className="home__select"
+                value={selectedKey}
+                onChange={(e) => setSelectedKey(e.target.value as KeyType)}
+              >
+                <option value="C">C (도)</option>
+                <option value="D">D (레)</option>
+                <option value="E">E (미)</option>
+                <option value="F">F (파)</option>
+                <option value="G">G (솔)</option>
+                <option value="A">A (라)</option>
+                <option value="B">B (시)</option>
+              </select>
+            </label>
+          </div>
+
           <div className="home__bpm-selector">
             <label className="home__label">
               BPM: {bpm}
@@ -165,7 +213,7 @@ const DrumPage: React.FC = () => {
           </div>
 
           <button
-            onClick={playDrums}
+            onClick={playMelody}
             disabled={isPlaying}
             className="home__play-button"
           >
@@ -174,19 +222,19 @@ const DrumPage: React.FC = () => {
         </div>
 
         <div className="home__drum-legend">
-          <h3>드럼 악보 기호</h3>
+          <h3>기타 악보 기호</h3>
           <div className="home__drum-legend-items">
             <div className="home__drum-legend-item">
-              <span className="home__drum-legend-symbol">C (X)</span>
-              <span className="home__drum-legend-label">Bass Drum</span>
+              <span className="home__drum-legend-symbol">C4</span>
+              <span className="home__drum-legend-label">Middle C</span>
             </div>
             <div className="home__drum-legend-item">
-              <span className="home__drum-legend-symbol">E (○)</span>
-              <span className="home__drum-legend-label">Snare</span>
+              <span className="home__drum-legend-symbol">G4</span>
+              <span className="home__drum-legend-label">G</span>
             </div>
             <div className="home__drum-legend-item">
-              <span className="home__drum-legend-symbol">G (X)</span>
-              <span className="home__drum-legend-label">Hi-Hat</span>
+              <span className="home__drum-legend-symbol">A4</span>
+              <span className="home__drum-legend-label">A</span>
             </div>
           </div>
         </div>
@@ -194,24 +242,21 @@ const DrumPage: React.FC = () => {
         <div className="musical-staff">
           <div id="osmd-container">
             <p style={{ textAlign: 'center', color: '#666', padding: '20px' }}>
-              드럼 악보를 로딩 중...
+              기타 악보를 로딩 중...
             </p>
           </div>
         </div>
 
-        <DrumKit
-          activeDrum={currentNoteIndex >= 0 ? drumNotes[currentNoteIndex].drum : undefined}
-        />
-
         <div className="home__info">
           {currentNoteIndex >= 0 && (
-            <p>현재 드럼: {drumNotes[currentNoteIndex].drum}</p>
+            <p>현재 음표: {guitarNotes[currentNoteIndex].note}</p>
           )}
           <p>BPM: {bpm}</p>
+          <p>조성: {selectedKey}</p>
         </div>
       </div>
     </div>
   );
 };
 
-export default DrumPage;
+export default GuitarPage;
